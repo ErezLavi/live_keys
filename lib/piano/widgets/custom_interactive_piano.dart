@@ -3,9 +3,11 @@ import 'package:piano/piano.dart';
 import 'package:collection/collection.dart';
 
 typedef OnNotePositionTapped = void Function(NotePosition position);
+typedef OnNotePositionReleased = void Function(NotePosition position);
+
 
 /// Renders a scrollable interactive piano.
-class InteractivePiano extends StatefulWidget {
+class CustomInteractivePiano extends StatefulWidget {
   /// The range of notes to create interactive keys for.
   final NoteRange noteRange;
 
@@ -38,6 +40,7 @@ class InteractivePiano extends StatefulWidget {
 
   /// Callback for interacting with piano keys.
   final OnNotePositionTapped? onNotePositionTapped;
+  final OnNotePositionReleased? onNotePositionReleased;
 
   /// Set and change at any time (i.e. with `setState`) to cause the piano to scroll so that the desired note is centered.
   final NotePosition? noteToScrollTo;
@@ -62,8 +65,8 @@ class InteractivePiano extends StatefulWidget {
   ///
   /// Normally you'll want to pass `keyWidth`—if you don't, the entire range of notes
   /// will be squashed into the width of the widget.
-  const InteractivePiano(
-      {Key? key,
+  const CustomInteractivePiano(
+      {super.key,
         required this.noteRange,
         this.highlightedNotes = const [],
         this.highlightColor = Colors.red,
@@ -74,15 +77,14 @@ class InteractivePiano extends StatefulWidget {
         this.hideNoteNames = false,
         this.hideScrollbar = false,
         this.onNotePositionTapped,
+        this.onNotePositionReleased,
         this.noteToScrollTo,
-        this.keyWidth})
-      : super(key: key);
-
+        this.keyWidth});
   @override
-  _InteractivePianoState createState() => _InteractivePianoState();
+  _CustomInteractivePianoState createState() => _CustomInteractivePianoState();
 }
 
-class _InteractivePianoState extends State<InteractivePiano> {
+class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
   /// We group notes into blocks of contiguous accidentals, since they need to be stacked
   late List<List<NotePosition>> _noteGroups;
 
@@ -102,7 +104,7 @@ class _InteractivePianoState extends State<InteractivePiano> {
   }
 
   @override
-  void didUpdateWidget(covariant InteractivePiano oldWidget) {
+  void didUpdateWidget(covariant CustomInteractivePiano oldWidget) {
     if (oldWidget.noteRange != widget.noteRange ||
         oldWidget.useAlternativeAccidentals !=
             widget.useAlternativeAccidentals) {
@@ -202,7 +204,8 @@ class _InteractivePianoState extends State<InteractivePiano> {
                                 ? widget.highlightColor
                                 : null,
                             keyWidth: _lastKeyWidth,
-                            onTap: _onNoteTapped(note)))
+                            onTapDown: _onNotePressed(note),
+                            onTapUp: _onNoteReleased(note)))
                             .toList(),
                       ),
                       Positioned(
@@ -230,22 +233,35 @@ class _InteractivePianoState extends State<InteractivePiano> {
                                         ? widget.highlightColor
                                         : null,
                                     keyWidth: _lastKeyWidth,
-                                    onTap: _onNoteTapped(note),
-                                  ),
-                                )
+                                    onTapDown: _onNotePressed(note),
+                                    onTapUp: _onNoteReleased(note)))
                                     .toList(),
-                              ))),
+                              )
+                          )
+                      ),
                     ],
                   );
-                }));
+                }
+              )
+        );
       }),
     ),
   );
 
-  void Function()? _onNoteTapped(NotePosition notePosition) =>
+  // void Function()? _onNoteTapped(NotePosition notePosition) =>
+  //     widget.onNotePositionTapped == null
+  //         ? null
+  //         : () => widget.onNotePositionTapped!(notePosition);
+
+  void Function()? _onNotePressed(NotePosition notePosition) =>
       widget.onNotePositionTapped == null
           ? null
           : () => widget.onNotePositionTapped!(notePosition);
+
+  void Function()? _onNoteReleased(NotePosition notePosition) =>
+      widget.onNotePositionReleased == null
+          ? null
+          : () => widget.onNotePositionReleased!(notePosition);
 }
 
 class _PianoKey extends StatefulWidget {
@@ -253,7 +269,8 @@ class _PianoKey extends StatefulWidget {
   final double keyWidth;
   final BorderRadius _borderRadius;
   final bool hideNoteName;
-  final VoidCallback? onTap;
+  final VoidCallback? onTapDown;
+  final VoidCallback? onTapUp;
   final bool isAnimated;
 
   final Color _color;
@@ -263,7 +280,8 @@ class _PianoKey extends StatefulWidget {
     required this.notePosition,
     required this.keyWidth,
     required this.hideNoteName,
-    required this.onTap,
+    required this.onTapDown,
+    required this.onTapUp,
     required this.isAnimated,
     required Color color,
     Color? highlightColor,
@@ -361,12 +379,8 @@ class __PianoKeyState extends State<_PianoKey>
                   child: InkWell(
                     borderRadius: widget._borderRadius,
                     highlightColor: Colors.grey,
-                    onTap: widget.onTap == null ? null : () {},
-                    onTapDown: widget.onTap == null
-                        ? null
-                        : (_) {
-                      widget.onTap!();
-                    },
+                    onTapDown: widget.onTapDown == null ? null : (_) => widget.onTapDown!(),
+                    onTapUp: widget.onTapUp == null ? null : (_) => widget.onTapUp!(),
                   ))),
           Positioned(
             left: 0.0,

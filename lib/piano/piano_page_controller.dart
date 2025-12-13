@@ -25,7 +25,6 @@ class PianoPageController extends ChangeNotifier {
 
   void handleKey(KeyEvent event) {
     var updated = false;
-
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.bracketLeft) {
         final newOctave = (_keyboardOctave - 1).clamp(0, 8).toInt();
@@ -79,16 +78,9 @@ class PianoPageController extends ChangeNotifier {
     }
   }
 
-  void toggleNote(NotePosition position) {
-    if (_pressedNotes.contains(position)) {
-      _pressedNotes.remove(position);
-
-      midi.stopNote(
-        channel: 0,
-        key: position.pitch,
-        sfId: sfId!,
-      );
-    } else {
+  void pressNote(NotePosition position) {
+    debugPrint("Pressing note $position");
+    if (!_pressedNotes.contains(position)) {
       _pressedNotes.add(position);
 
       midi.playNote(
@@ -97,11 +89,26 @@ class PianoPageController extends ChangeNotifier {
         velocity: 100,
         sfId: sfId!,
       );
+
+      _updateChord();
+      notifyListeners();
     }
-    _updateChord();
-    notifyListeners();
   }
 
+  void releaseNote(NotePosition position) {
+    if (_pressedNotes.contains(position)) {
+      _pressedNotes.remove(position);
+
+      midi.stopNote(
+        channel: 0,
+        key: position.pitch,
+        sfId: sfId!,
+      );
+
+      _updateChord();
+      notifyListeners();
+    }
+  }
 
   NotePosition _noteFromOffset(int semitone) {
     final octave = semitone ~/ 12;

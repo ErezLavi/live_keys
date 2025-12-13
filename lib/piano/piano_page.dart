@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piano_app/piano/widgets/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
+import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
 
 class PianoPage extends StatefulWidget {
   const PianoPage({super.key, required this.controller});
@@ -54,13 +55,26 @@ class _PianoPageState extends State<PianoPage> {
         children: [
           Expanded(
             flex: 1,
-            child: Center(
-              child: Text(
-                _controller .currentChord,
-                style: const TextStyle(
-                  fontSize: 72,
-                  fontWeight: FontWeight.bold,
-                ),
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  GrandStaffViewerWidget(
+                    pressedNotes: _controller.pressedNotes,
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        _controller.currentChord,
+                        style: const TextStyle(
+                          fontSize: 88,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

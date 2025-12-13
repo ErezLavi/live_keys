@@ -59,6 +59,7 @@ flutter:
 
   assets:
     - assets/sf2/yamaha_piano.sf2
+    - assets/sf2/Rhodes.sf2
 
   # To add assets to your application, add an assets section, like this:
   # assets:

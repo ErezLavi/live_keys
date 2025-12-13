@@ -125,7 +125,6 @@ class PianoPageController extends ChangeNotifier {
   int? sfId;
 
   void pressNote(NotePosition position) {
-    debugPrint("Pressing note $position");
     if (!_pressedNotes.contains(position)) {
       _pressedNotes.add(position);
 
@@ -159,7 +158,7 @@ class PianoPageController extends ChangeNotifier {
   //*** MIDI sound ***
   Future<void> loadSoundFont() async {
     sfId = await midi.loadSoundfontAsset(
-      assetPath: 'assets/sf2/yamaha_piano.sf2',
+      assetPath: 'assets/sf2/Rhodes.sf2',
       bank: 0,
       program: 0,
     );

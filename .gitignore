@@ -58,3 +58,6 @@ app.*.map.json
 **/*.obj
 **/*.a
 **/*.so
+
+# Assets
+**/assets/*

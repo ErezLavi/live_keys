@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+import 'package:piano_app/piano/piano_page.dart';
+import 'package:piano_app/piano/piano_page_controller.dart';
+
+void main() {
+  final pianoPageController = PianoPageController();
+  runApp(MyApp(controller: pianoPageController));
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key, required this.controller});
+
+  final PianoPageController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Live Keys',
+      home: PianoPage(controller: controller),
+    );
+  }
+}

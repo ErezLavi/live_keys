@@ -108,7 +108,7 @@ class ChordDetector {
 
     // 1st inversion: 3rd in bass → optional
     if (bassInt == 3 || bassInt == 4) {
-      showSlash = false; // choose true if you want Am/E etc.
+      showSlash = true; // choose true if you want Am/E etc.
     }
 
     // 2nd inversion: 5th in bass → usually HIDDEN

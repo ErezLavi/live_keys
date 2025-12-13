@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "piano_app",
+            "cwd": "piano_app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "piano_app (profile mode)",
+            "cwd": "piano_app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "piano_app (release mode)",
+            "cwd": "piano_app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "piano_app_v2",
+            "cwd": "piano_app_v2",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}

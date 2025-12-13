@@ -11,13 +11,13 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 
-//TODO: 1. mouse click release issue.
-//TODO: 2. Create a small design prototype
-//TODO: 4. re-examine the chord_detector algorithm
-//TODO: 5. Show the clef widget
-//TODO: 6. Show chords in all inversions + scales widget
-//TODO: 7. settings widget
-//TODO: 8. games.
+//TODO: 1. *Create a small design prototype
+//TODO: 2. re-examine the chord_detector algorithm
+//TODO: 3. Show the clef widget
+//TODO: 4. Show chords in all inversions + scales widget
+//TODO: 5. games - play given chord/scale/note by its name/clef/sound.(3+)
+//TODO: 6. more sound samples (rhodes etc..)
+//TODO: 7. settings widget - adjust color, layout and more...
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
@@ -69,7 +69,7 @@ class _PianoPageState extends State<PianoPage> {
             child: KeyboardListener(
               focusNode: _controller.focusNode,
               autofocus: true,
-              onKeyEvent: _controller.handleKey,
+              onKeyEvent: _controller.handleKeyboardKey,
               child: CustomInteractivePiano(
                 highlightedNotes: _controller.pressedNotes,
                 naturalColor: Colors.white,

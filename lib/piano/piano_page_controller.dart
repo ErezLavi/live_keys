@@ -18,8 +18,6 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
-  StreamSubscription<MidiPacket>? _midiDataSubscription;
-  StreamSubscription<String>? _midiSetupSubscription;
 
   int _keyboardOctave = 4;
   String currentChord = '';
@@ -27,7 +25,12 @@ class PianoPageController extends ChangeNotifier {
   List<NotePosition> get pressedNotes => _pressedNotes.toList();
   NoteRange get noteRange => fullRange;
 
-  void handleKey(KeyEvent event) {
+  void _updateChord() {
+    final detected = ChordDetector.detect(_pressedNotes);
+    currentChord = detected?.name ?? "";
+  }
+
+  void handleKeyboardKey(KeyEvent event) {
     var updated = false;
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.bracketLeft) {
@@ -82,38 +85,6 @@ class PianoPageController extends ChangeNotifier {
     }
   }
 
-  void pressNote(NotePosition position) {
-    debugPrint("Pressing note $position");
-    if (!_pressedNotes.contains(position)) {
-      _pressedNotes.add(position);
-
-      midi.playNote(
-        channel: 0,
-        key: position.pitch,
-        velocity: 100,
-        sfId: sfId!,
-      );
-
-      _updateChord();
-      notifyListeners();
-    }
-  }
-
-  void releaseNote(NotePosition position) {
-    if (_pressedNotes.contains(position)) {
-      _pressedNotes.remove(position);
-
-      midi.stopNote(
-        channel: 0,
-        key: position.pitch,
-        sfId: sfId!,
-      );
-
-      _updateChord();
-      notifyListeners();
-    }
-  }
-
   NotePosition _noteFromOffset(int semitone) {
     final octave = semitone ~/ 12;
     switch (semitone % 12) {
@@ -150,15 +121,42 @@ class PianoPageController extends ChangeNotifier {
     }
   }
 
-  void _updateChord() {
-    final detected = ChordDetector.detect(_pressedNotes);
-    currentChord = detected?.name ?? "";
-  }
-
   final MidiPro midi = MidiPro();
-  final MidiCommand midiCommand = MidiCommand();
   int? sfId;
 
+  void pressNote(NotePosition position) {
+    debugPrint("Pressing note $position");
+    if (!_pressedNotes.contains(position)) {
+      _pressedNotes.add(position);
+
+      midi.playNote(
+        channel: 0,
+        key: position.pitch,
+        velocity: 100,
+        sfId: sfId!,
+      );
+
+      _updateChord();
+      notifyListeners();
+    }
+  }
+
+  void releaseNote(NotePosition position) {
+    if (_pressedNotes.contains(position)) {
+      _pressedNotes.remove(position);
+
+      midi.stopNote(
+        channel: 0,
+        key: position.pitch,
+        sfId: sfId!,
+      );
+
+      _updateChord();
+      notifyListeners();
+    }
+  }
+
+  //*** MIDI sound ***
   Future<void> loadSoundFont() async {
     sfId = await midi.loadSoundfontAsset(
       assetPath: 'assets/sf2/yamaha_piano.sf2',
@@ -173,6 +171,12 @@ class PianoPageController extends ChangeNotifier {
       program: 0,
     );
   }
+
+  // *** MIDI hardware ***
+  StreamSubscription<MidiPacket>? _midiDataSubscription;
+  StreamSubscription<String>? _midiSetupSubscription;
+  final MidiCommand midiCommand = MidiCommand();
+
 
   Future<void> startHardwareMidiListening() async {
     _midiDataSubscription ??=
@@ -246,5 +250,4 @@ class PianoPageController extends ChangeNotifier {
     focusNode.dispose();
     super.dispose();
   }
-
 }

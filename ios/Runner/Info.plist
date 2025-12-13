@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSMusicUsageDescription</key>
+    <string>This app receives MIDI input from external devices</string>
 </dict>
 </plist>

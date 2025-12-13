@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano/piano.dart';
 import 'package:piano_app/common/constants.dart';
+import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_midi_pro/flutter_midi_pro.dart';
 import 'chord_detector.dart';
 
@@ -16,6 +18,8 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
+  StreamSubscription<MidiPacket>? _midiDataSubscription;
+  StreamSubscription<String>? _midiSetupSubscription;
 
   int _keyboardOctave = 4;
   String currentChord = '';
@@ -152,6 +156,7 @@ class PianoPageController extends ChangeNotifier {
   }
 
   final MidiPro midi = MidiPro();
+  final MidiCommand midiCommand = MidiCommand();
   int? sfId;
 
   Future<void> loadSoundFont() async {
@@ -169,9 +174,75 @@ class PianoPageController extends ChangeNotifier {
     );
   }
 
+  Future<void> startHardwareMidiListening() async {
+    _midiDataSubscription ??=
+        midiCommand.onMidiDataReceived?.listen(_handleMidiPacket);
+
+    _midiSetupSubscription ??=
+        midiCommand.onMidiSetupChanged?.listen((_) => _connectToFirstDevice());
+
+    await _connectToFirstDevice();
+  }
+
+  Future<void> _connectToFirstDevice() async {
+    try {
+      final devices = await midiCommand.devices;
+      if (devices == null) {
+        debugPrint('No MIDI devices detected');
+        return;
+      }
+
+      MidiDevice? target;
+      for (final device in devices) {
+        if (device.connected) {
+          target = device;
+          break;
+        }
+        target ??= device;
+      }
+
+      if (target == null) {
+        return;
+      }
+
+      if (!target.connected) {
+        await midiCommand.connectToDevice(target);
+        debugPrint('Connected to MIDI device: ${target.name}');
+      }
+    } catch (e) {
+      debugPrint('Failed to connect to MIDI device: $e');
+    }
+  }
+
+  void _handleMidiPacket(MidiPacket packet) {
+    final data = packet.data;
+    if (data.length < 3) return;
+
+    final status = data[0] & 0xF0;
+    final key = data[1];
+    final velocity = data[2];
+    final notePosition = _noteFromMidiKey(key);
+
+    if (notePosition == null) return;
+
+    if (status == 0x90 && velocity > 0) {
+      pressNote(notePosition);
+    } else if (status == 0x80 || (status == 0x90 && velocity == 0)) {
+      releaseNote(notePosition);
+    }
+  }
+
+  NotePosition? _noteFromMidiKey(int key) {
+    if (key < 0 || key > 127) return null;
+    final note = _noteFromOffset(key);
+    if (!fullRange.contains(note)) return null;
+    return note;
+  }
 
   @override
   void dispose() {
+    _midiDataSubscription?.cancel();
+    _midiSetupSubscription?.cancel();
     focusNode.dispose();
     super.dispose();
   }

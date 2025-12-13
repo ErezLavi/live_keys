@@ -31,6 +31,7 @@ class _PianoPageState extends State<PianoPage> {
     super.initState();
     _controller = widget.controller;
     _controller.loadSoundFont();
+    _controller.startHardwareMidiListening();
     _controller.addListener(_onControllerUpdated);
   }
 

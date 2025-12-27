@@ -2,6 +2,9 @@
 import 'package:flutter/services.dart';
 
 class Constants {
+
+  static const String rhodesSoundFontAsset = 'assets/sf2/Rhodes.sf2';
+
   static final Map<LogicalKeyboardKey, int> keyboardKeyOffsets = {
     LogicalKeyboardKey.keyZ: 0,
     LogicalKeyboardKey.keyS: 1,
@@ -60,6 +63,38 @@ class Constants {
     "7b5":    {0, 4, 6, 10},
     "7#5":    {0, 4, 8, 10},   // 7aug
     "maj7#5": {0, 4, 8, 11},   // M7#5 / augMaj7
+  };
+
+  // Lower is simpler / preferred in tie-breaks.
+  static const Map<String, int> chordRank = {
+    "": 0,
+    "m": 1,
+    "7": 2,
+    "maj7": 3,
+    "m7": 4,
+    "mMaj7": 5,
+    "sus2": 6,
+    "sus4": 7,
+    "dim": 8,
+    "dim7": 9,
+    "aug": 10,
+    "9": 11,
+    "11": 12,
+    "13": 13,
+    "7b9": 14,
+    "7#9": 15,
+    "7#11": 16,
+    "7b13": 17,
+    "add4": 18,
+    "add9": 19,
+    "6": 20,
+    "m9(no7)": 21,
+    "m6": 22,
+    "m7b5": 23,
+    "7sus4": 24,
+    "7b5": 25,
+    "7#5": 26,
+    "maj7#5": 27,
   };
 
   static const sharpNames = [

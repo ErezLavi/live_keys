@@ -12,9 +12,9 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 
-//TODO: 1. *Create a small design prototype
+//TODO: 1. * Create a small design prototype
 //TODO: 2. re-examine the chord_detector algorithm
-//TODO: 3. Show the clef widget
+//TODO: 3. Show the clef widget - done
 //TODO: 4. Show chords in all inversions + scales widget
 //TODO: 5. games - play given chord/scale/note by its name/clef/sound.(3+)
 //TODO: 6. more sound samples (rhodes etc..)

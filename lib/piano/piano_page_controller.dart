@@ -158,7 +158,7 @@ class PianoPageController extends ChangeNotifier {
   //*** MIDI sound ***
   Future<void> loadSoundFont() async {
     sfId = await midi.loadSoundfontAsset(
-      assetPath: 'assets/sf2/Rhodes.sf2',
+      assetPath: Constants.rhodesSoundFontAsset,
       bank: 0,
       program: 0,
     );

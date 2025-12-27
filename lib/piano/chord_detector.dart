@@ -15,42 +15,70 @@ class DetectedChord {
 class ChordDetector {
   /// Main entry point
   static DetectedChord? detect(Set<NotePosition> pressed) {
-    if (pressed.length < 3) return null;
+    // Convert to pitch classes 0–11 with deterministic order
+    final List<int> pcs = pressed
+        .map((e) => e.pitch % 12)
+        .toSet()
+        .toList()
+      ..sort();
 
-    // Convert to pitch classes 0–11
-    final pcs = pressed.map((e) => e.pitch % 12).toSet();
+    final pcsSet = pcs.toSet();
+    if (pcsSet.length < 3) return null;
 
     // True bass (lowest real pitch)
     final bassPc =
         pressed.reduce((a, b) => a.pitch < b.pitch ? a : b).pitch % 12;
 
-    DetectedChord? best;
-    int bestScore = -99999;
+    final candidates = <Candidate>[];
 
     for (final rootPc in pcs) {
-      final playedIntervals = _intervalsFromRoot(pcs, rootPc);
+      final playedIntervals = _intervalsFromRoot(pcsSet, rootPc);
 
       for (final entry in Constants.chordDB.entries) {
         final chordType = entry.key;
         final template = entry.value;
 
-        final score = _scoreChord(template, playedIntervals);
-
         // Reject wrong triad roots:
         if (!_acceptableRoot(template, playedIntervals)) continue;
 
-        if (score > bestScore) {
-          bestScore = score;
-          best = DetectedChord(
-            name: _buildName(rootPc, bassPc, chordType, playedIntervals, template),
-            root: rootPc,
-            bass: bassPc,
-          );
-        }
+        final score = _scoreChord(template, playedIntervals);
+        candidates.add(Candidate(rootPc, chordType, score));
       }
     }
 
-    return best;
+    if (candidates.isEmpty) return null;
+
+    candidates.sort((a, b) {
+      if (a.score != b.score) {
+        return b.score.compareTo(a.score);
+      }
+
+      final aRank = Constants.chordRank[a.type] ?? 9999;
+      final bRank = Constants.chordRank[b.type] ?? 9999;
+      if (aRank != bRank) {
+        return aRank.compareTo(bRank);
+      }
+
+      if (a.root == bassPc && b.root != bassPc) return -1;
+      if (b.root == bassPc && a.root != bassPc) return 1;
+
+      return a.root.compareTo(b.root);
+    });
+
+    final best = candidates.first;
+    final playedIntervals = _intervalsFromRoot(pcsSet, best.root);
+
+    return DetectedChord(
+      name: _buildName(
+        best.root,
+        bassPc,
+        best.type,
+        playedIntervals,
+        Constants.chordDB[best.type]!,
+      ),
+      root: best.root,
+      bass: bassPc,
+    );
   }
 
   /// Convert played notes to interval set
@@ -111,9 +139,9 @@ class ChordDetector {
       showSlash = true; // choose true if you want Am/E etc.
     }
 
-    // 2nd inversion: 5th in bass → usually HIDDEN
+    // 2nd inversion: 5th in bass → usually shown
     else if (bassInt == 7) {
-      showSlash = false; // keep as root position chord
+      showSlash = true; // show as root position chord
     }
 
     // Other bass notes ALWAYS slash
@@ -128,4 +156,12 @@ class ChordDetector {
 
     return name;
   }
+}
+
+class Candidate {
+  final int root;
+  final String type;
+  final int score;
+
+  Candidate(this.root, this.type, this.score);
 }

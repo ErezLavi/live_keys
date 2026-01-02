@@ -1,15 +1,19 @@
 import 'package:piano_app/common/constants.dart';
 import 'package:piano/piano.dart';
 
-
-//TODO: need to be examined / rewritten.
-
 class DetectedChord {
   final String name;
   final int root;
   final int bass;
 
   DetectedChord({required this.name, required this.root, required this.bass});
+}
+class Candidate {
+  final int root;
+  final String type;
+  final int score;
+
+  Candidate(this.root, this.type, this.score);
 }
 
 class ChordDetector {
@@ -41,11 +45,22 @@ class ChordDetector {
         // Reject wrong triad roots:
         if (!_acceptableRoot(template, playedIntervals)) continue;
 
+        final required = Constants.chordRequiredIntervals[chordType];
+        if (required != null &&
+            !required.every(playedIntervals.contains)) {
+          continue;
+        }
+
+        final isSus = chordType.contains("sus");
+        if (isSus &&
+            (playedIntervals.contains(3) || playedIntervals.contains(4))) {
+          continue;
+        }
+
         final score = _scoreChord(template, playedIntervals);
         candidates.add(Candidate(rootPc, chordType, score));
       }
     }
-
     if (candidates.isEmpty) return null;
 
     candidates.sort((a, b) {
@@ -123,12 +138,16 @@ class ChordDetector {
       Set<int> playedIntervals,
       Set<int> template,
       ) {
+    final hasFifth = playedIntervals.contains(7) || playedIntervals.contains(8);
+    final bassIsMaj7 = (bassPc - rootPc + 12) % 12 == 11;
+    if (bassIsMaj7 && !hasFifth) {
+      return "${Constants.noteName(bassPc)}/${Constants.noteName(rootPc)}";
+    }
+
     final rootName = Constants.noteName(rootPc);
     String name = "$rootName$chordType";
 
-    // If bass == root → no inversion
     if (bassPc == rootPc) return name;
-
     int bassInt = (bassPc - rootPc + 12) % 12;
 
     // Show slash only for unusual basses (sus chords, 7th chords, add chords)
@@ -136,12 +155,12 @@ class ChordDetector {
 
     // 1st inversion: 3rd in bass → optional
     if (bassInt == 3 || bassInt == 4) {
-      showSlash = true; // choose true if you want Am/E etc.
+      showSlash = true; 
     }
 
     // 2nd inversion: 5th in bass → usually shown
     else if (bassInt == 7) {
-      showSlash = true; // show as root position chord
+      showSlash = true; 
     }
 
     // Other bass notes ALWAYS slash
@@ -156,12 +175,4 @@ class ChordDetector {
 
     return name;
   }
-}
-
-class Candidate {
-  final int root;
-  final String type;
-  final int score;
-
-  Candidate(this.root, this.type, this.score);
 }

@@ -65,6 +65,25 @@ class Constants {
     "maj7#5": {0, 4, 8, 11},   // M7#5 / augMaj7
   };
 
+  // Required intervals that must be explicitly present to allow a chord type.
+  static final Map<String, Set<int>> chordRequiredIntervals = {
+    // Suspensions
+    "sus2": {2},
+    "sus4": {5},
+    "7sus4": {5},
+
+    // Altered fifths
+    "aug": {8},
+    "7#5": {8},
+    "maj7#5": {8},
+
+    // Altered extensions
+    "7b9": {1},
+    "7#9": {3},
+    "7#11": {6},
+    "7b13": {8},
+  };
+
   // Lower is simpler / preferred in tie-breaks.
   static const Map<String, int> chordRank = {
     "": 0,

@@ -30,6 +30,18 @@ class PianoPageController extends ChangeNotifier {
     currentChord = detected?.name ?? "";
   }
 
+  (String, String) splitChordName(String chord) {
+    if (chord.isEmpty) return ('', '');
+    int rootLen = 1;
+    if (chord.length > 1) {
+      final accidental = chord[1];
+      if (accidental == '#' || accidental == 'b') {
+        rootLen = 2;
+      }
+    }
+    return (chord.substring(0, rootLen), chord.substring(rootLen));
+  }
+
   void handleKeyboardKey(KeyEvent event) {
     var updated = false;
     if (event is KeyDownEvent) {
@@ -175,7 +187,6 @@ class PianoPageController extends ChangeNotifier {
   StreamSubscription<MidiPacket>? _midiDataSubscription;
   StreamSubscription<String>? _midiSetupSubscription;
   final MidiCommand midiCommand = MidiCommand();
-
 
   Future<void> startHardwareMidiListening() async {
     _midiDataSubscription ??=

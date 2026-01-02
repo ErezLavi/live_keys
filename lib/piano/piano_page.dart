@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:piano_app/piano/widgets/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
+import 'package:piano_app/piano/widgets/chord_viewer.dart';
 
 class PianoPage extends StatefulWidget {
   const PianoPage({super.key, required this.controller});
@@ -12,13 +13,11 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 
-//TODO: 1. * Create a small design prototype
-//TODO: 2. re-examine the chord_detector algorithm
-//TODO: 3. Show the clef widget - done
-//TODO: 4. Show chords in all inversions + scales widget
-//TODO: 5. games - play given chord/scale/note by its name/clef/sound.(3+)
-//TODO: 6. more sound samples (rhodes etc..)
-//TODO: 7. settings widget - adjust color, layout and more...
+//TODO: 1. re-examine the chord_detector algorithm
+//TODO: 2. Show chords in all inversions + scales widget
+//TODO: 3. switch between 2 sound samples on menu
+//TODO: 4. games - play given chord/scale/note by its name/clef/sound.(3+)
+//TODO: 5. settings widget - adjust color, layout and more...
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
@@ -46,10 +45,6 @@ class _PianoPageState extends State<PianoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Live Keys'),
-        centerTitle: true,
-      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -63,15 +58,9 @@ class _PianoPageState extends State<PianoPage> {
                     pressedNotes: _controller.pressedNotes,
                   ),
                   Expanded(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        _controller.currentChord,
-                        style: const TextStyle(
-                          fontSize: 88,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    child: ChordViewer(
+                      chord: _controller.currentChord,
+                      splitChordName: _controller.splitChordName,
                     ),
                   ),
                 ],

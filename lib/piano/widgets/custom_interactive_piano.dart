@@ -69,7 +69,7 @@ class CustomInteractivePiano extends StatefulWidget {
       {super.key,
         required this.noteRange,
         this.highlightedNotes = const [],
-        this.highlightColor = Colors.red,
+        this.highlightColor = Colors.purple,
         this.naturalColor = Colors.white,
         this.accidentalColor = Colors.black,
         this.animateHighlightedNotes = false,

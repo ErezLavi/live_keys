@@ -25,8 +25,11 @@ class GrandStaffViewerWidget extends StatelessWidget {
     final trebleRange = NoteRange.forClefs([Clef.Treble]);
     final bassRange = NoteRange.forClefs([Clef.Bass]);
 
+    final middleC = NotePosition(note: Note.C, octave: 4);
     final trebleNotes = _filterNotesForClef(Clef.Treble, trebleRange);
-    final bassNotes = _filterNotesForClef(Clef.Bass, bassRange);
+    final bassNotes = _filterNotesForClef(Clef.Bass, bassRange)
+        .where((note) => note.notePosition != middleC)
+        .toList();
 
     return SizedBox(
       child: Column(

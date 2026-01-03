@@ -5,15 +5,11 @@ class ChordViewer extends StatelessWidget {
     super.key,
     required this.chord,
     required this.splitChordName,
-    this.rootFontSize = 84,
-    this.suffixFontSize = 72,
     this.fontWeight = FontWeight.bold,
   });
 
   final String chord;
   final (String, String) Function(String) splitChordName;
-  final double rootFontSize;
-  final double suffixFontSize;
   final FontWeight fontWeight;
 
   @override
@@ -22,29 +18,35 @@ class ChordViewer extends StatelessWidget {
     if (root.isEmpty && suffix.isEmpty) {
       return const Text('');
     }
-
-    return Align(
-      alignment: Alignment.center,
-      child: Text.rich(
-        TextSpan(
-          children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scaledRootSize = (constraints.maxWidth * 0.2).clamp(48.0, 140.0);
+        final scaledSuffixSize = (constraints.maxWidth * 0.18).clamp(36.0, 120.0);
+        
+        return Align(
+          alignment: Alignment.center,
+          child: Text.rich(
             TextSpan(
-              text: root,
-              style: TextStyle(
-                fontSize: rootFontSize,
-                fontWeight: fontWeight,
-              ),
+              children: [
+                TextSpan(
+                  text: root,
+                  style: TextStyle(
+                    fontSize: scaledRootSize,
+                    fontWeight: fontWeight,
+                  ),
+                ),
+                TextSpan(
+                  text: suffix,
+                  style: TextStyle(
+                    fontSize: scaledSuffixSize,
+                    fontWeight: fontWeight,
+                  ),
+                ),
+              ],
             ),
-            TextSpan(
-              text: suffix,
-              style: TextStyle(
-                fontSize: suffixFontSize,
-                fontWeight: fontWeight,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

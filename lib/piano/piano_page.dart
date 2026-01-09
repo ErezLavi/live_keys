@@ -13,9 +13,9 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 
-//TODO: 1. re-examine the chord_detector algorithm
-//TODO: 2. Show chords in all inversions + scales widget
-//TODO: 3. switch between 2 sound samples on menu
+//TODO: 1. re-examine the chord_detector algorithm - done
+//TODO: 2. menu - Show chords in all inversions + scales widget
+//TODO: 3. switch sf2 + show connected devices on menu
 //TODO: 4. games - play given chord/scale/note by its name/clef/sound.(3+)
 //TODO: 5. settings widget - adjust color, layout and more...
 
@@ -44,6 +44,9 @@ class _PianoPageState extends State<PianoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final keyWidth = (screenWidth / 20).clamp(24.0, 60.0);
+
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -77,7 +80,7 @@ class _PianoPageState extends State<PianoPage> {
                 highlightedNotes: _controller.pressedNotes,
                 naturalColor: Colors.white,
                 accidentalColor: Colors.black,
-                keyWidth: 40,
+                keyWidth: keyWidth,
                 noteRange: _controller.noteRange,
                 onNotePositionTapped: _controller.pressNote,
                 onNotePositionReleased: _controller.releaseNote,

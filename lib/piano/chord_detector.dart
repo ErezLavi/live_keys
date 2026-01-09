@@ -8,6 +8,7 @@ class DetectedChord {
 
   DetectedChord({required this.name, required this.root, required this.bass});
 }
+
 class Candidate {
   final int root;
   final String type;
@@ -19,7 +20,6 @@ class Candidate {
 class ChordDetector {
   /// Main entry point
   static DetectedChord? detect(Set<NotePosition> pressed) {
-    // Convert to pitch classes 0–11 with deterministic order
     final List<int> pcs = pressed
         .map((e) => e.pitch % 12)
         .toSet()
@@ -29,20 +29,24 @@ class ChordDetector {
     final pcsSet = pcs.toSet();
     if (pcsSet.length < 3) return null;
 
-    // True bass (lowest real pitch)
     final bassPc =
         pressed.reduce((a, b) => a.pitch < b.pitch ? a : b).pitch % 12;
 
     final candidates = <Candidate>[];
 
     for (final rootPc in pcs) {
+      // Root must actually be played (no rootless inference)
+      if (!pcsSet.contains(rootPc)) continue;
+
       final playedIntervals = _intervalsFromRoot(pcsSet, rootPc);
+
+      // HARD structural gate: must be a real chord
+      //if (!_isStructurallyChord(playedIntervals)) continue;
 
       for (final entry in Constants.chordDB.entries) {
         final chordType = entry.key;
         final template = entry.value;
 
-        // Reject wrong triad roots:
         if (!_acceptableRoot(template, playedIntervals)) continue;
 
         final required = Constants.chordRequiredIntervals[chordType];
@@ -50,6 +54,9 @@ class ChordDetector {
             !required.every(playedIntervals.contains)) {
           continue;
         }
+
+        final missing = template.difference(playedIntervals).length;
+        if (missing > 1) continue;
 
         final isSus = chordType.contains("sus");
         if (isSus &&
@@ -61,6 +68,7 @@ class ChordDetector {
         candidates.add(Candidate(rootPc, chordType, score));
       }
     }
+
     if (candidates.isEmpty) return null;
 
     candidates.sort((a, b) {
@@ -68,14 +76,14 @@ class ChordDetector {
         return b.score.compareTo(a.score);
       }
 
+      if (a.root == bassPc && b.root != bassPc) return -1;
+      if (b.root == bassPc && a.root != bassPc) return 1;
+
       final aRank = Constants.chordRank[a.type] ?? 9999;
       final bRank = Constants.chordRank[b.type] ?? 9999;
       if (aRank != bRank) {
         return aRank.compareTo(bRank);
       }
-
-      if (a.root == bassPc && b.root != bassPc) return -1;
-      if (b.root == bassPc && a.root != bassPc) return 1;
 
       return a.root.compareTo(b.root);
     });
@@ -89,7 +97,6 @@ class ChordDetector {
         bassPc,
         best.type,
         playedIntervals,
-        Constants.chordDB[best.type]!,
       ),
       root: best.root,
       bass: bassPc,
@@ -100,79 +107,60 @@ class ChordDetector {
   static Set<int> _intervalsFromRoot(Set<int> pcs, int root) {
     final out = <int>{};
     for (final p in pcs) {
-      int i = (p - root + 12) % 12;
+      final i = (p - root + 12) % 12;
       if (i != 0) out.add(i);
     }
     return out;
   }
 
-  /// Score poorly matching chords lower
-  static int _scoreChord(Set<int> template, Set<int> played) {
-    int extra = played.difference(template).length;
-    int missing = template.difference(played).length;
+  // static bool _isStructurallyChord(Set<int> intervals) {
+  //   final hasThird =
+  //       intervals.contains(3) || intervals.contains(4);
 
-    return -(extra + missing * 2); // missing is worse than extra
+  //   final hasSus =
+  //       intervals.contains(2) || intervals.contains(5);
+
+  //   // Must define harmony somehow
+  //   return hasThird || hasSus;
+  // }
+
+  static int _scoreChord(Set<int> template, Set<int> played) {
+    final extra = played.difference(template).length;
+    final missing = template.difference(played).length;
+    return -(extra + missing);
   }
 
-  /// Ensure we don't pick impossible triad roots
   static bool _acceptableRoot(Set<int> template, Set<int> played) {
-    bool templateIsTriad =
-        template.contains(4) && template.contains(7) ||
-            template.contains(3) && template.contains(7);
+    final isMajorTriad =
+        template.contains(4) && template.contains(7);
+    final isMinorTriad =
+        template.contains(3) && template.contains(7);
 
-    bool playedHasTriad =
-        played.contains(4) && played.contains(7) ||
-            played.contains(3) && played.contains(7);
+    // Only require the third (quality-defining interval), not the fifth
+    if (isMajorTriad && !played.contains(4)) {
+      return false;
+    }
 
-    // If the chord template is a triad but player did NOT play triad intervals → reject this root
-    if (templateIsTriad && !playedHasTriad) return false;
+    if (isMinorTriad && !played.contains(3)) {
+      return false;
+    }
 
     return true;
   }
 
   /// Naming logic including slash/inversion rules
   static String _buildName(
-      int rootPc,
-      int bassPc,
-      String chordType,
-      Set<int> playedIntervals,
-      Set<int> template,
-      ) {
-    final hasFifth = playedIntervals.contains(7) || playedIntervals.contains(8);
-    final bassIsMaj7 = (bassPc - rootPc + 12) % 12 == 11;
-    if (bassIsMaj7 && !hasFifth) {
-      return "${Constants.noteName(bassPc)}/${Constants.noteName(rootPc)}";
-    }
-
+    int rootPc,
+    int bassPc,
+    String chordType,
+    Set<int> playedIntervals,
+  ) {
     final rootName = Constants.noteName(rootPc);
     String name = "$rootName$chordType";
 
     if (bassPc == rootPc) return name;
-    int bassInt = (bassPc - rootPc + 12) % 12;
 
-    // Show slash only for unusual basses (sus chords, 7th chords, add chords)
-    bool showSlash = false;
-
-    // 1st inversion: 3rd in bass → optional
-    if (bassInt == 3 || bassInt == 4) {
-      showSlash = true; 
-    }
-
-    // 2nd inversion: 5th in bass → usually shown
-    else if (bassInt == 7) {
-      showSlash = true; 
-    }
-
-    // Other bass notes ALWAYS slash
-    else {
-      showSlash = true;
-    }
-
-    if (showSlash) {
-      final bassName = Constants.noteName(bassPc);
-      return "$name/$bassName";
-    }
-
-    return name;
+    final bassName = Constants.noteName(bassPc);
+    return "$name/$bassName";
   }
 }

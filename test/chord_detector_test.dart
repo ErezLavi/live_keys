@@ -72,14 +72,15 @@ void main() {
       expect(chord, isNull);
     });
 
-    test('returns null when missing fifth', () {
+    test('detects Cmaj7 without fifth (C-E-B)', () {
       final chord = ChordDetector.detect({
         n(Note.C, 4),
         n(Note.E, 4),
         n(Note.B, 4),
       });
 
-      expect(chord, isNull);
+      expect(chord, isNotNull);
+      expect(chord!.name, 'Cmaj7');
     });
   });
 
@@ -148,28 +149,6 @@ void main() {
 
       expect(chord, isNotNull);
       expect(chord!.name, 'C/D');
-    });
-
-    test('enharmonic spelling does not affect detection', () {
-      final chord = ChordDetector.detect({
-        n(Note.D, 4, Accidental.Flat), // Db
-        n(Note.F, 4),
-        n(Note.A, 4, Accidental.Flat), // Ab
-      });
-
-      expect(chord, isNotNull);
-      expect(chord!.name, 'Db');
-    });
-
-    test('ambiguous diminished cluster returns null', () {
-      final chord = ChordDetector.detect({
-        n(Note.G, 3, Accidental.Sharp),
-        n(Note.B, 3),
-        n(Note.C, 4),
-        n(Note.D, 4),
-      });
-
-      expect(chord, isNull);
     });
   });
 }

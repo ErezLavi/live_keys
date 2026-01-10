@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:piano_app/piano/piano_page.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(const [
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
   final pianoPageController = PianoPageController();
   runApp(MyApp(controller: pianoPageController));
 }

@@ -42,8 +42,11 @@ class _PianoPageState extends State<PianoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
     final keyWidth = (screenWidth / 20).clamp(24.0, 60.0);
+    final horizontalPadding = (screenSize.width * 0.04).clamp(12.0, 32.0);
+    final verticalPadding = (screenSize.height * 0.02).clamp(8.0, 16.0);
 
     return Scaffold(
       body: Stack(
@@ -94,7 +97,10 @@ class _PianoPageState extends State<PianoPage> {
             child: Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
                 child: TopMenuBar(
                   onChordSelected: _controller.onChordSelected,
                   onChordCleared: _controller.clearSelectedChord,

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class ChordViewer extends StatelessWidget {
@@ -20,9 +22,13 @@ class ChordViewer extends StatelessWidget {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        final scaledRootSize = (constraints.maxWidth * 0.2).clamp(48.0, 140.0);
-        final scaledSuffixSize = (constraints.maxWidth * 0.18).clamp(36.0, 120.0);
-        
+        final maxHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : constraints.maxWidth;
+        final sizeBasis = math.min(constraints.maxWidth, maxHeight);
+        final scaledRootSize = (sizeBasis * 0.3).clamp(48.0, 140.0);
+        final scaledSuffixSize = (sizeBasis * 0.3).clamp(36.0, 120.0);
+
         return Align(
           alignment: Alignment.center,
           child: Text.rich(

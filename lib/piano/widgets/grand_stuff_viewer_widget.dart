@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:piano/piano.dart';
 
+import 'custom_clef_image.dart';
+
 class GrandStaffViewerWidget extends StatelessWidget {
   final Color clefColor;
   final Color noteColor;
@@ -36,7 +38,7 @@ class GrandStaffViewerWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
-            child: ClefImage(
+            child: CustomClefImage(
               clef: Clef.Treble,
               noteRange: trebleRange,
               noteImages: trebleNotes,
@@ -46,7 +48,7 @@ class GrandStaffViewerWidget extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ClefImage(
+            child: CustomClefImage(
               clef: Clef.Bass,
               noteRange: bassRange,
               noteImages: bassNotes,

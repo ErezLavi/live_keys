@@ -19,7 +19,7 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
-  List<String> _connectedDeviceNames = ['Computer Keyboard'];
+  List<String> _connectedDeviceNames = [''];
 
   // Variables
   int _keyboardOctave = 4;
@@ -402,7 +402,7 @@ class PianoPageController extends ChangeNotifier {
     List<MidiDevice>? devices, {
     String? ensureName,
   }) {
-    final names = <String>['Computer Keyboard'];
+    final names = <String>['Devices Keyboard'];
     if (devices != null) {
       for (final device in devices) {
         if (device.connected) {

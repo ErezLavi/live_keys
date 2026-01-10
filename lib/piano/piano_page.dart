@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:piano/piano.dart';
 import 'package:piano_app/piano/widgets/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
@@ -23,49 +22,9 @@ class PianoPage extends StatefulWidget {
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
-  List<NotePosition> _selectedChordNotes = [];
-  int? _selectedChordRootPc;
-  String _selectedChordType = '';
 
   void _onControllerUpdated() {
-    if (_selectedChordRootPc != null) {
-    _selectedChordNotes = _buildChordNotesForOctave(
-      _selectedChordRootPc!,
-      _selectedChordType,
-      _controller.keyboardOctave,
-    );
-    }
     setState(() {});
-  }
-
-  void _onChordSelected(int rootPc, String chordType) {
-    _selectedChordRootPc = rootPc;
-    _selectedChordType = chordType;
-    final chordNotes = _buildChordNotesForOctave(
-      rootPc,
-      chordType,
-      _controller.keyboardOctave,
-    );
-
-    setState(() {
-      _selectedChordNotes = chordNotes;
-    });
-  }
-
-  void _clearSelectedChord() {
-    setState(() {
-      _selectedChordRootPc = null;
-      _selectedChordType = '';
-      _selectedChordNotes = [];
-    });
-  }
-
-  List<NotePosition> _buildChordNotesForOctave(
-    int rootPc,
-    String chordType,
-    int octave,
-  ) {
-    return _controller.buildChordNotesForOctave(rootPc, chordType, octave);
   }
 
   @override
@@ -122,7 +81,7 @@ class _PianoPageState extends State<PianoPage> {
                   onKeyEvent: _controller.handleKeyboardKey,
                   child: CustomInteractivePiano(
                     highlightedNotes: _controller.pressedNotes,
-                    chordHighlightedNotes: _selectedChordNotes,
+                    chordHighlightedNotes: _controller.combinedHighlightedNotes,
                     naturalColor: Colors.white,
                     accidentalColor: Colors.black,
                     keyWidth: keyWidth,
@@ -138,10 +97,12 @@ class _PianoPageState extends State<PianoPage> {
             child: Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 child: TopMenuBar(
-                  onChordSelected: _onChordSelected,
-                  onChordCleared: _clearSelectedChord,
+                  onChordSelected: _controller.onChordSelected,
+                  onChordCleared: _controller.clearSelectedChord,
+                  onScaleSelected: _controller.onScaleSelected,
+                  onScaleCleared: _controller.clearSelectedScale,
                 ),
               ),
             ),

@@ -2,9 +2,10 @@
 import 'package:flutter/services.dart';
 
 class Constants {
-
+  // sounds
   static const String rhodesSoundFontAsset = 'assets/sf2/Rhodes.sf2';
 
+  // colors
   static const Color playedNoteColor = Color(0xFF6E026F);
   static const Color highlightedNoteColor = Color(0xFFF29AAE);
 
@@ -67,8 +68,25 @@ class Constants {
     "7b5":    {4, 6, 10},
     "7#5":    {4, 8, 10},
     "maj7#5": {4, 8, 11},
-
     "maj9":   {4, 7, 11, 2},
+  };
+
+  static Map<String, Set<int>> scaleDB = {
+    "major": {0, 2, 4, 5, 7, 9, 11, 12},
+    "natural_minor": {0, 2, 3, 5, 7, 8, 10, 12},
+    "harmonic_minor": {0, 2, 3, 5, 7, 8, 11, 12},
+    "melodic_minor": {0, 2, 3, 5, 7, 9, 11, 12},
+    "dorian": {0, 2, 3, 5, 7, 9, 10, 12},
+    "phrygian": {0, 1, 3, 5, 7, 8, 10, 12},
+    "lydian": {0, 2, 4, 6, 7, 9, 11, 12},
+    "mixolydian": {0, 2, 4, 5, 7, 9, 10, 12},
+    "locrian": {0, 1, 3, 5, 6, 8, 10, 12},
+    "major_pentatonic": {0, 2, 4, 7, 9, 12},
+    "minor_pentatonic": {0, 3, 5, 7, 10, 12},
+    "blues": {0, 3, 5, 6, 7, 10, 12},
+    "chromatic": {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12},
+    "whole_tone": {0, 2, 4, 6, 8, 10, 12},
+    "diminished_whole_half": {0, 2, 3, 5, 6, 8, 9, 11, 12},
   };
 
   // Required intervals that must be explicitly present to allow a chord type.

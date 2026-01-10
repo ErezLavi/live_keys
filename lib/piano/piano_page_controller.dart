@@ -19,12 +19,28 @@ class PianoPageController extends ChangeNotifier {
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
 
+  // Variables
   int _keyboardOctave = 4;
   String currentChord = '';
+  List<NotePosition> _selectedChordNotes = [];
+  int? _selectedChordRootPc;
+  String _selectedChordType = '';
+  List<NotePosition> _selectedScaleNotes = [];
+  int? _selectedScaleRootPc;
+  String _selectedScaleType = 'major';
 
+  // Getters
   List<NotePosition> get pressedNotes => _pressedNotes.toList();
+  List<NotePosition> get selectedChordNotes => _selectedChordNotes;
+  List<NotePosition> get selectedScaleNotes => _selectedScaleNotes;
   NoteRange get noteRange => fullRange;
   int get keyboardOctave => _keyboardOctave;
+  List<NotePosition> get combinedHighlightedNotes {
+    final combined = <NotePosition>{};
+    combined.addAll(_selectedChordNotes);
+    combined.addAll(_selectedScaleNotes);
+    return combined.toList();
+  }
 
   void _updateChord() {
     final detected = ChordDetector.detect(_pressedNotes);
@@ -45,12 +61,14 @@ class PianoPageController extends ChangeNotifier {
 
   void handleKeyboardKey(KeyEvent event) {
     var updated = false;
+    var octaveChanged = false;
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.bracketLeft) {
         final newOctave = (_keyboardOctave - 1).clamp(0, 8).toInt();
         if (newOctave != _keyboardOctave) {
           _keyboardOctave = newOctave;
           updated = true;
+          octaveChanged = true;
         }
       } else if (event.logicalKey == LogicalKeyboardKey.bracketRight) {
         final newOctave = (_keyboardOctave + 1).clamp(0, 8).toInt();
@@ -58,6 +76,7 @@ class PianoPageController extends ChangeNotifier {
 
           _keyboardOctave = newOctave;
           updated = true;
+          octaveChanged = true;
         }
       } else {
         final offset = Constants.keyboardKeyOffsets[event.logicalKey];
@@ -93,6 +112,9 @@ class PianoPageController extends ChangeNotifier {
     }
 
     if (updated) {
+      if (octaveChanged) {
+        _rebuildSelectedHighlights();
+      }
       notifyListeners();
       _updateChord();
     }
@@ -157,6 +179,84 @@ class PianoPageController extends ChangeNotifier {
     }
 
     return selectedNotes;
+  }
+
+  void onChordSelected(int rootPc, String chordType) {
+    _selectedChordRootPc = rootPc;
+    _selectedChordType = chordType;
+    _selectedChordNotes = buildChordNotesForOctave(
+      rootPc,
+      chordType,
+      _keyboardOctave,
+    );
+    notifyListeners();
+  }
+
+  void clearSelectedChord() {
+    _selectedChordRootPc = null;
+    _selectedChordType = '';
+    _selectedChordNotes = [];
+    notifyListeners();
+  }
+
+  List<NotePosition> buildScaleNotesForOctave(
+    int rootPc,
+    String scaleType,
+    int octave,
+  ) {
+    final intervals = Constants.scaleDB[scaleType];
+    if (intervals == null) return [];
+
+    final rootPitch = octave * 12 + rootPc;
+    final orderedIntervals = intervals.toList()..sort();
+    final selectedNotes = <NotePosition>[];
+    final usedPitches = <int>{};
+
+    for (final interval in orderedIntervals) {
+      final pitch = rootPitch + interval;
+      if (!usedPitches.add(pitch)) continue;
+      final note = noteFromOffset(pitch);
+      if (fullRange.contains(note)) {
+        selectedNotes.add(note);
+      }
+    }
+
+    return selectedNotes;
+  }
+
+  void onScaleSelected(int rootPc, String scaleType) {
+    _selectedScaleRootPc = rootPc;
+    _selectedScaleType = scaleType;
+    _selectedScaleNotes = buildScaleNotesForOctave(
+      rootPc,
+      scaleType,
+      _keyboardOctave,
+    );
+    notifyListeners();
+  }
+
+  void clearSelectedScale() {
+    _selectedScaleRootPc = null;
+    _selectedScaleType = 'major';
+    _selectedScaleNotes = [];
+    notifyListeners();
+  }
+
+  void _rebuildSelectedHighlights() {
+    if (_selectedChordRootPc != null) {
+      _selectedChordNotes = buildChordNotesForOctave(
+        _selectedChordRootPc!,
+        _selectedChordType,
+        _keyboardOctave,
+      );
+    }
+    if (_selectedScaleRootPc != null) {
+      _selectedScaleNotes = buildScaleNotesForOctave(
+        _selectedScaleRootPc!,
+        _selectedScaleType,
+        _keyboardOctave,
+      );
+    }
   }
 
   List<int> _normalizeChordIntervals(String chordType, Set<int> intervals) {

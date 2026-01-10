@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piano_app/piano/widgets/custom_interactive_piano.dart';
+import 'package:piano_app/piano/custom_piano/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
 import 'package:piano_app/piano/widgets/chord_viewer.dart';
@@ -13,9 +13,10 @@ class PianoPage extends StatefulWidget {
   @override
   State<PianoPage> createState() => _PianoPageState();
 }
-
-//TODO: 4. settings widget - adjust color, sf2, show keyboard mapping...
-//TODO: 5. games - play given chord/scale/note by its name/clef/sound.(3+)
+//TODO: fork piano package and delete custom piano widgets
+//TODO: add change octave buttons
+//TODO: settings widget - adjust color, sf2 etc ...
+//TODO: games - play given chord/scale/note by its name/clef/sound.(3+)
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;

@@ -54,9 +54,10 @@ class _ScalesGridState extends State<ScalesGrid> {
               Row(
                 children: [
                   Spacer(),
-                  TextButton(
+                  TextButton.icon(
                     onPressed: widget.onScaleCleared,
-                    child: const Text('Clear'),
+                    icon: const Icon(Icons.clear),
+                    label: const Text('Clear'),
                   ),
                 ],
               ),

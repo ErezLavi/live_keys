@@ -34,6 +34,7 @@ dependencies:
   piano: 1.0.4
   flutter_midi_pro: ^3.0.0
   flutter_midi_command: ^0.5.3
+  flutter_launcher_icons: ^0.14.2
 
 dev_dependencies:
   flutter_test:

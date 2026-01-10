@@ -66,9 +66,10 @@ class _ChordsGridState extends State<ChordsGrid> {
               Row(
                 children: [
                   Spacer(),
-                  TextButton(
+                  TextButton.icon(
                     onPressed: widget.onChordCleared,
-                    child: const Text('Clear'),
+                    icon: const Icon(Icons.clear),
+                    label: const Text('Clear'),
                   ),
                 ],
               ),

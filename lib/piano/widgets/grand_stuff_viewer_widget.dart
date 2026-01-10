@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piano/piano.dart';
-
-import 'custom_clef_image.dart';
+import 'package:piano_app/piano/custom_piano/custom_clef_image.dart';
 
 class GrandStaffViewerWidget extends StatelessWidget {
   final Color clefColor;

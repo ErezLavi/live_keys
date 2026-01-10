@@ -1,16 +1,36 @@
-# piano_app
+# Live Keys
 
-A new Flutter project.
+Live Keys is a Flutter piano app with real time chord detection,
+MIDI input support and a playable keyboard (based on the awesome piano package and more).
+
+## Features
+
+- Chord detection with a large chord name display
+- Grand staff view of currently pressed notes
+- Chord and scales highlighting from the top-right menu
+- Hardware MIDI input (auto-connects to the first device found)
+- SoundFont playback via bundled SF2 assets
+
+## Controls
+
+- Computer keyboard mapping:
+  - `Z S X D C V G B H N J M , L . ; /`
+  - `[` and `]` to shift the keyboard octave
+
+## SoundFonts
+
+The app ships with SF2 files in `assets/sf2`. The default soundfont is set in
+`lib/common/constants.dart` (`rhodesSoundFontAsset`). Swap this to change the
+instrument.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Install Flutter (SDK 3.9+).
+2. Fetch dependencies:
+   ```bash
+   flutter pub get
+   ```
+3. Run the app:
+   ```bash
+   flutter run
+   ```

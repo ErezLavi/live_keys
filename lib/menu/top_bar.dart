@@ -11,6 +11,7 @@ class TopMenuBar extends StatelessWidget {
   final VoidCallback? onChordCleared;
   final OnScaleSelected? onScaleSelected;
   final VoidCallback? onScaleCleared;
+  final List<String> deviceNames;
 
   const TopMenuBar({
     super.key,
@@ -22,6 +23,7 @@ class TopMenuBar extends StatelessWidget {
     this.onChordCleared,
     this.onScaleSelected,
     this.onScaleCleared,
+    required this.deviceNames,
   });
 
   @override
@@ -93,6 +95,31 @@ class TopMenuBar extends StatelessWidget {
                       onScaleSelected: onScaleSelected,
                       onScaleCleared: onScaleCleared,
                     ),
+                  ],
+                ),
+                MenuAnchor(
+                  builder: (context, controller, _) {
+                    return IconButton(
+                      icon: const Icon(Icons.devices),
+                      tooltip: 'Devices',
+                      iconSize: iconSize,
+                      padding: iconPadding,
+                      constraints: buttonConstraints,
+                      onPressed: () {
+                        if (controller.isOpen) {
+                          controller.close();
+                        } else {
+                          controller.open();
+                        }
+                      },
+                    );
+                  },
+                  menuChildren: [
+                    for (final device in deviceNames)
+                      MenuItemButton(
+                        onPressed: () {},
+                        child: Text(device),
+                      ),
                   ],
                 ),
                 MenuAnchor(

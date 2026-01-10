@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:piano/piano.dart';
 import 'package:piano_app/piano/widgets/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
 import 'package:piano_app/piano/widgets/chord_viewer.dart';
+import 'package:piano_app/menu/top_bar.dart';
 
 class PianoPage extends StatefulWidget {
   const PianoPage({super.key, required this.controller});
@@ -13,17 +15,57 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 
-//TODO: 1. re-examine the chord_detector algorithm - done
 //TODO: 2. menu - Show chords in all inversions + scales widget
 //TODO: 3. switch sf2 + show connected devices on menu
 //TODO: 4. games - play given chord/scale/note by its name/clef/sound.(3+)
 //TODO: 5. settings widget - adjust color, layout and more...
+//TODO: 6. support scales in chord_detector and top_bar
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
+  List<NotePosition> _selectedChordNotes = [];
+  int? _selectedChordRootPc;
+  String _selectedChordType = '';
 
   void _onControllerUpdated() {
+    if (_selectedChordRootPc != null) {
+    _selectedChordNotes = _buildChordNotesForOctave(
+      _selectedChordRootPc!,
+      _selectedChordType,
+      _controller.keyboardOctave,
+    );
+    }
     setState(() {});
+  }
+
+  void _onChordSelected(int rootPc, String chordType) {
+    _selectedChordRootPc = rootPc;
+    _selectedChordType = chordType;
+    final chordNotes = _buildChordNotesForOctave(
+      rootPc,
+      chordType,
+      _controller.keyboardOctave,
+    );
+
+    setState(() {
+      _selectedChordNotes = chordNotes;
+    });
+  }
+
+  void _clearSelectedChord() {
+    setState(() {
+      _selectedChordRootPc = null;
+      _selectedChordType = '';
+      _selectedChordNotes = [];
+    });
+  }
+
+  List<NotePosition> _buildChordNotesForOctave(
+    int rootPc,
+    String chordType,
+    int octave,
+  ) {
+    return _controller.buildChordNotesForOctave(rootPc, chordType, octave);
   }
 
   @override
@@ -48,42 +90,59 @@ class _PianoPageState extends State<PianoPage> {
     final keyWidth = (screenWidth / 20).clamp(24.0, 60.0);
 
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  GrandStaffViewerWidget(
-                    pressedNotes: _controller.pressedNotes,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      GrandStaffViewerWidget(
+                        pressedNotes: _controller.pressedNotes,
+                      ),
+                      Expanded(
+                        child: ChordViewer(
+                          chord: _controller.currentChord,
+                          splitChordName: _controller.splitChordName,
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: ChordViewer(
-                      chord: _controller.currentChord,
-                      splitChordName: _controller.splitChordName,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              Expanded(
+                flex: 1,
+                child: KeyboardListener(
+                  focusNode: _controller.focusNode,
+                  autofocus: true,
+                  onKeyEvent: _controller.handleKeyboardKey,
+                  child: CustomInteractivePiano(
+                    highlightedNotes: _controller.pressedNotes,
+                    chordHighlightedNotes: _selectedChordNotes,
+                    naturalColor: Colors.white,
+                    accidentalColor: Colors.black,
+                    keyWidth: keyWidth,
+                    noteRange: _controller.noteRange,
+                    onNotePositionTapped: _controller.pressNote,
+                    onNotePositionReleased: _controller.releaseNote,
+                  ),
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            flex: 1,
-            child: KeyboardListener(
-              focusNode: _controller.focusNode,
-              autofocus: true,
-              onKeyEvent: _controller.handleKeyboardKey,
-              child: CustomInteractivePiano(
-                highlightedNotes: _controller.pressedNotes,
-                naturalColor: Colors.white,
-                accidentalColor: Colors.black,
-                keyWidth: keyWidth,
-                noteRange: _controller.noteRange,
-                onNotePositionTapped: _controller.pressNote,
-                onNotePositionReleased: _controller.releaseNote,
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                child: TopMenuBar(
+                  onChordSelected: _onChordSelected,
+                  onChordCleared: _clearSelectedChord,
+                ),
               ),
             ),
           ),

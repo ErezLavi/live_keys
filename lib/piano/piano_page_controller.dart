@@ -24,6 +24,7 @@ class PianoPageController extends ChangeNotifier {
 
   List<NotePosition> get pressedNotes => _pressedNotes.toList();
   NoteRange get noteRange => fullRange;
+  int get keyboardOctave => _keyboardOctave;
 
   void _updateChord() {
     final detected = ChordDetector.detect(_pressedNotes);
@@ -62,7 +63,7 @@ class PianoPageController extends ChangeNotifier {
         final offset = Constants.keyboardKeyOffsets[event.logicalKey];
         if (offset != null && !_activeKeyNotes.containsKey(event.logicalKey)) {
           final semitone = _keyboardOctave * 12 + offset;
-          final note = _noteFromOffset(semitone);
+          final note = noteFromOffset(semitone);
 
           if (fullRange.contains(note)) {
             _pressedNotes.add(note);
@@ -97,7 +98,7 @@ class PianoPageController extends ChangeNotifier {
     }
   }
 
-  NotePosition _noteFromOffset(int semitone) {
+  NotePosition noteFromOffset(int semitone) {
     final octave = semitone ~/ 12;
     switch (semitone % 12) {
       case 0:
@@ -131,6 +132,59 @@ class PianoPageController extends ChangeNotifier {
       default:
         return NotePosition(note: Note.B, octave: octave);
     }
+  }
+
+  List<NotePosition> buildChordNotesForOctave(
+    int rootPc,
+    String chordType,
+    int octave,
+  ) {
+    final intervals = Constants.chordDB[chordType];
+    if (intervals == null) return [];
+
+    final rootPitch = octave * 12 + rootPc;
+    final orderedIntervals = _normalizeChordIntervals(chordType, intervals);
+    final selectedNotes = <NotePosition>[];
+    final usedPitches = <int>{};
+
+    for (final interval in orderedIntervals) {
+      final pitch = rootPitch + interval;
+      if (!usedPitches.add(pitch)) continue;
+      final note = noteFromOffset(pitch);
+      if (fullRange.contains(note)) {
+        selectedNotes.add(note);
+      }
+    }
+
+    return selectedNotes;
+  }
+
+  List<int> _normalizeChordIntervals(String chordType, Set<int> intervals) {
+    final extensionIntervals = <int>{};
+
+    if (chordType.contains('9')) {
+      extensionIntervals.add(2);
+    }
+    if (chordType.contains('11')) {
+      extensionIntervals.addAll([2, 5]);
+    }
+    if (chordType.contains('13')) {
+      extensionIntervals.addAll([2, 5, 9]);
+    }
+    if (chordType.contains('b9')) extensionIntervals.add(1);
+    if (chordType.contains('#9')) extensionIntervals.add(3);
+    if (chordType.contains('#11')) extensionIntervals.add(6);
+    if (chordType.contains('b13')) extensionIntervals.add(8);
+
+    final normalized = <int>{0, ...intervals}.map((interval) {
+      if (interval != 0 && extensionIntervals.contains(interval)) {
+        return interval + 12;
+      }
+      return interval;
+    }).toList()
+      ..sort();
+
+    return normalized;
   }
 
   final MidiPro midi = MidiPro();
@@ -248,7 +302,7 @@ class PianoPageController extends ChangeNotifier {
 
   NotePosition? _noteFromMidiKey(int key) {
     if (key < 0 || key > 127) return null;
-    final note = _noteFromOffset(key);
+    final note = noteFromOffset(key);
     if (!fullRange.contains(note)) return null;
     return note;
   }

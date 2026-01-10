@@ -5,6 +5,9 @@ class Constants {
 
   static const String rhodesSoundFontAsset = 'assets/sf2/Rhodes.sf2';
 
+  static const Color playedNoteColor = Color(0xFF6E026F);
+  static const Color highlightedNoteColor = Color(0xFFF29AAE);
+
   static final Map<LogicalKeyboardKey, int> keyboardKeyOffsets = {
     LogicalKeyboardKey.keyZ: 0,
     LogicalKeyboardKey.keyS: 1,
@@ -51,19 +54,19 @@ class Constants {
     "7b13":   {4, 7, 10, 8},
 
     // --- Additions ---
-
-    "add4":   {4, 7, 5},    // add 4
-    "add9":   {4, 7, 2},    // could be add2
-
-    "6":      {4, 7, 9},    // maj6
+    "add4":   {4, 7, 5},
+    "add9":   {4, 7, 2},    
+    "6":      {4, 7, 9},
+    "m9":     {3, 7, 10, 2},
+    "m11":    {3, 7, 10, 2, 5},
+    "m13":    {3, 7, 10, 2, 5, 9},
     "m9(no7)":{3, 7, 2},
-    "m6":     {3, 7, 9},    // minor 6
-
-    "m7b5":   {3, 6, 10},   // half-diminished / ø7
-    "7sus4":  {5, 7, 10},   // 7sus
+    "m6":     {3, 7, 9},
+    "m7b5":   {3, 6, 10},
+    "7sus4":  {5, 7, 10},
     "7b5":    {4, 6, 10},
-    "7#5":    {4, 8, 10},   // 7aug
-    "maj7#5": {4, 8, 11},   // M7#5 / augMaj7
+    "7#5":    {4, 8, 10},
+    "maj7#5": {4, 8, 11},
 
     "maj9":   {4, 7, 11, 2},
   };
@@ -95,8 +98,6 @@ class Constants {
     "7": 2,
     "maj7": 3,
     "m7": 4,
-    "mMaj7": 5,
-    "mMaj7#5": 6,
     "maj9": 7,
     "sus2": 8,
     "sus4": 9,
@@ -106,20 +107,25 @@ class Constants {
     "9": 13,
     "11": 14,
     "13": 15,
-    "7b9": 16,
-    "7#9": 17,
-    "7#11": 18,
-    "7b13": 19,
     "add4": 20,
     "add9": 21,
     "6": 22,
-    "m9(no7)": 23,
-    "m6": 24,
-    "m7b5": 25,
-    "7sus4": 26,
-    "7b5": 27,
-    "7#5": 28,
-    "maj7#5": 29,
+    "m9": 23,
+    "m11": 24,
+    "m13": 25,
+    "m6": 26,
+    "m7b5": 27,
+    "7sus4": 28,
+    "7b5": 29,
+    "7#5": 30,
+    "maj7#5": 31,
+    "m9(no7)": 32,
+    "mMaj7": 33,
+    "mMaj7#5": 34,
+    "7b9": 35,
+    "7#9": 36,
+    "7#11": 37,
+    "7b13": 38,
   };
 
   static const sharpNames = [

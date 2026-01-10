@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:piano/piano.dart';
 import 'package:collection/collection.dart';
+import 'package:piano_app/common/constants.dart';
 
 typedef OnNotePositionTapped = void Function(NotePosition position);
 typedef OnNotePositionReleased = void Function(NotePosition position);
@@ -13,6 +14,9 @@ class CustomInteractivePiano extends StatefulWidget {
 
   /// The range of notes to highlight.
   final List<NotePosition> highlightedNotes;
+
+  /// The notes that should show the chord marker decoration.
+  final List<NotePosition> chordHighlightedNotes;
 
   /// The color with which to draw highlighted notes; blended with the color of the key.
   final Color highlightColor;
@@ -69,7 +73,8 @@ class CustomInteractivePiano extends StatefulWidget {
       {super.key,
         required this.noteRange,
         this.highlightedNotes = const [],
-        this.highlightColor = Colors.purple,
+        this.chordHighlightedNotes = const [],
+        this.highlightColor = Constants.playedNoteColor,
         this.naturalColor = Colors.white,
         this.accidentalColor = Colors.black,
         this.animateHighlightedNotes = false,
@@ -203,6 +208,8 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
                             widget.highlightedNotes.contains(note)
                                 ? widget.highlightColor
                                 : null,
+                            showChordMarker: widget.chordHighlightedNotes
+                                .contains(note),
                             keyWidth: _lastKeyWidth,
                             onTapDown: _onNotePressed(note),
                             onTapUp: _onNoteReleased(note)))
@@ -232,6 +239,9 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
                                         .contains(note)
                                         ? widget.highlightColor
                                         : null,
+                                    showChordMarker: widget
+                                        .chordHighlightedNotes
+                                        .contains(note),
                                     keyWidth: _lastKeyWidth,
                                     onTapDown: _onNotePressed(note),
                                     onTapUp: _onNoteReleased(note)))
@@ -272,6 +282,7 @@ class _PianoKey extends StatefulWidget {
   final VoidCallback? onTapDown;
   final VoidCallback? onTapUp;
   final bool isAnimated;
+  final bool showChordMarker;
 
   final Color _color;
 
@@ -283,6 +294,7 @@ class _PianoKey extends StatefulWidget {
     required this.onTapDown,
     required this.onTapUp,
     required this.isAnimated,
+    required this.showChordMarker,
     required Color color,
     Color? highlightColor,
   })  : _borderRadius = BorderRadius.only(
@@ -303,7 +315,7 @@ class __PianoKeyState extends State<_PianoKey>
   late Animation<double> _animation;
 
   @override
-  void initState() {
+  void initState() { //TODO: check if needed for games
     super.initState();
 
     const animationBegin = 1.0;
@@ -388,19 +400,19 @@ class __PianoKeyState extends State<_PianoKey>
             bottom: widget.keyWidth / 3,
             child: IgnorePointer(
               child: Container(
-                // decoration: (widget.notePosition == NotePosition.middleC)
-                //     ? const BoxDecoration(
-                //   color: Colors.red,
-                //   shape: BoxShape.circle,
-                // )
-                //     : null,
+                decoration: widget.showChordMarker
+                    ? BoxDecoration(
+                  color: Constants.highlightedNoteColor.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                )
+                    : null,
                 child: widget.hideNoteName
                     ? SizedBox(
                   width: widget.keyWidth / 2,
                   height: widget.keyWidth / 2,
                 )
                     : Padding(
-                  padding: const EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(5),
                   child: Text(
                     widget.notePosition.name,
                     textAlign: TextAlign.center,

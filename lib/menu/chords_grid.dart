@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:piano_app/common/constants.dart';
 
-typedef OnChordSelected = void Function(int rootPc, String chordType);
+typedef OnChordSelected = void Function(
+  int rootPc,
+  String chordType,
+  int inversion,
+);
 typedef OnChordCleared = void Function();
 
 class ChordsGrid extends StatefulWidget {
@@ -9,6 +13,7 @@ class ChordsGrid extends StatefulWidget {
   final OnChordCleared? onChordCleared;
   final int initialRootPc;
   final String initialChordType;
+  final int initialInversion;
 
   const ChordsGrid({
     super.key,
@@ -16,6 +21,7 @@ class ChordsGrid extends StatefulWidget {
     this.onChordCleared,
     this.initialRootPc = 0,
     this.initialChordType = '',
+    this.initialInversion = 0,
   });
 
   @override
@@ -25,12 +31,15 @@ class ChordsGrid extends StatefulWidget {
 class _ChordsGridState extends State<ChordsGrid> {
   late int _rootPc;
   late String _chordType;
+  late int _inversion;
 
   @override
   void initState() {
     super.initState();
     _rootPc = widget.initialRootPc;
     _chordType = widget.initialChordType;
+    _inversion = widget.initialInversion;
+    _clampInversion();
   }
 
   @override
@@ -40,6 +49,7 @@ class _ChordsGridState extends State<ChordsGrid> {
     final chordTypes = Constants.chordDB.keys
         .where((type) => (Constants.chordRank[type] ?? 999) <= 27)
         .toList();
+    final maxInversion = _maxInversion();
 
     return Material(
       color: Colors.transparent,
@@ -85,7 +95,7 @@ class _ChordsGridState extends State<ChordsGrid> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Type',
+                    'Quality',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ],
@@ -104,6 +114,26 @@ class _ChordsGridState extends State<ChordsGrid> {
                   );
                 }).toList(),
               ),
+              const SizedBox(height: 12),
+              Text(
+                'Inversion',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: List.generate(maxInversion + 1, (index) {
+                  final label = index == 0 ? 'Root' : '$index';
+                  final selected = _inversion == index;
+                  return ChoiceChip(
+                    label: Text(label),
+                    selected: selected,
+                    showCheckmark: false,
+                    onSelected: (_) => _selectInversion(index),
+                  );
+                }),
+              ),
             ],
           ),
         ),
@@ -115,14 +145,34 @@ class _ChordsGridState extends State<ChordsGrid> {
     setState(() {
       _rootPc = rootPc;
     });
-    widget.onChordSelected?.call(_rootPc, _chordType);
+    widget.onChordSelected?.call(_rootPc, _chordType, _inversion);
   }
 
   void _selectType(String chordType) {
     setState(() {
       _chordType = chordType;
+      _clampInversion();
     });
-    widget.onChordSelected?.call(_rootPc, _chordType);
+    widget.onChordSelected?.call(_rootPc, _chordType, _inversion);
+  }
+
+  void _selectInversion(int inversion) {
+    setState(() {
+      _inversion = inversion;
+    });
+    widget.onChordSelected?.call(_rootPc, _chordType, _inversion);
+  }
+
+  int _maxInversion() {
+    final maxFromType = Constants.maxChordInversion(_chordType);
+    return maxFromType.clamp(0, 3).toInt();
+  }
+
+  void _clampInversion() {
+    final max = _maxInversion();
+    if (_inversion > max) {
+      _inversion = max;
+    }
   }
 
   String _labelForChordType(String type) {

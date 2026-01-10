@@ -159,4 +159,24 @@ class Constants {
   static String noteName(int pc, {bool useFlats = false}) {
     return useFlats ? flatNames[pc] : sharpNames[pc];
   }
+
+  static int maxChordInversion(String chordType) {
+    final intervals = chordDB[chordType];
+    if (intervals == null) return 0;
+    final noteCount = intervals.length + 1;
+    return noteCount > 0 ? noteCount - 1 : 0;
+  }
+
+  static List<int> applyChordInversion(List<int> intervals, int inversion) {
+    if (intervals.isEmpty) return intervals;
+    if (inversion <= 0) return intervals;
+    final maxInversion = intervals.length - 1;
+    final safeInversion = inversion.clamp(0, maxInversion).toInt();
+    final adjusted = List<int>.from(intervals);
+    for (var i = 0; i < safeInversion; i++) {
+      adjusted[i] += 12;
+    }
+    adjusted.sort();
+    return adjusted;
+  }
 }

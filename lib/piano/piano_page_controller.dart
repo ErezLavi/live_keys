@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano/piano.dart';
@@ -18,6 +19,7 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
+  List<String> _connectedDeviceNames = ['Computer Keyboard'];
 
   // Variables
   int _keyboardOctave = 4;
@@ -25,6 +27,7 @@ class PianoPageController extends ChangeNotifier {
   List<NotePosition> _selectedChordNotes = [];
   int? _selectedChordRootPc;
   String _selectedChordType = '';
+  int _selectedChordInversion = 0;
   List<NotePosition> _selectedScaleNotes = [];
   int? _selectedScaleRootPc;
   String _selectedScaleType = 'major';
@@ -35,6 +38,9 @@ class PianoPageController extends ChangeNotifier {
   List<NotePosition> get selectedScaleNotes => _selectedScaleNotes;
   NoteRange get noteRange => fullRange;
   int get keyboardOctave => _keyboardOctave;
+  int get selectedChordInversion => _selectedChordInversion;
+  List<String> get connectedDeviceNames =>
+      List.unmodifiable(_connectedDeviceNames);
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
     combined.addAll(_selectedChordNotes);
@@ -160,16 +166,19 @@ class PianoPageController extends ChangeNotifier {
     int rootPc,
     String chordType,
     int octave,
+    int inversion,
   ) {
     final intervals = Constants.chordDB[chordType];
     if (intervals == null) return [];
 
     final rootPitch = octave * 12 + rootPc;
     final orderedIntervals = _normalizeChordIntervals(chordType, intervals);
+    final invertedIntervals =
+        Constants.applyChordInversion(orderedIntervals, inversion);
     final selectedNotes = <NotePosition>[];
     final usedPitches = <int>{};
 
-    for (final interval in orderedIntervals) {
+    for (final interval in invertedIntervals) {
       final pitch = rootPitch + interval;
       if (!usedPitches.add(pitch)) continue;
       final note = noteFromOffset(pitch);
@@ -181,13 +190,15 @@ class PianoPageController extends ChangeNotifier {
     return selectedNotes;
   }
 
-  void onChordSelected(int rootPc, String chordType) {
+  void onChordSelected(int rootPc, String chordType, int inversion) {
     _selectedChordRootPc = rootPc;
     _selectedChordType = chordType;
+    _selectedChordInversion = inversion;
     _selectedChordNotes = buildChordNotesForOctave(
       rootPc,
       chordType,
       _keyboardOctave,
+      _selectedChordInversion,
     );
     notifyListeners();
   }
@@ -195,6 +206,7 @@ class PianoPageController extends ChangeNotifier {
   void clearSelectedChord() {
     _selectedChordRootPc = null;
     _selectedChordType = '';
+    _selectedChordInversion = 0;
     _selectedChordNotes = [];
     notifyListeners();
   }
@@ -248,6 +260,7 @@ class PianoPageController extends ChangeNotifier {
         _selectedChordRootPc!,
         _selectedChordType,
         _keyboardOctave,
+        _selectedChordInversion,
       );
     }
     if (_selectedScaleRootPc != null) {
@@ -356,6 +369,7 @@ class PianoPageController extends ChangeNotifier {
     try {
       final devices = await midiCommand.devices;
       if (devices == null) {
+        _setConnectedDeviceNames(null);
         debugPrint('No MIDI devices detected');
         return;
       }
@@ -370,6 +384,7 @@ class PianoPageController extends ChangeNotifier {
       }
 
       if (target == null) {
+        _setConnectedDeviceNames(devices);
         return;
       }
 
@@ -377,8 +392,30 @@ class PianoPageController extends ChangeNotifier {
         await midiCommand.connectToDevice(target);
         debugPrint('Connected to MIDI device: ${target.name}');
       }
+      _setConnectedDeviceNames(devices, ensureName: target.name);
     } catch (e) {
       debugPrint('Failed to connect to MIDI device: $e');
+    }
+  }
+
+  void _setConnectedDeviceNames(
+    List<MidiDevice>? devices, {
+    String? ensureName,
+  }) {
+    final names = <String>['Computer Keyboard'];
+    if (devices != null) {
+      for (final device in devices) {
+        if (device.connected) {
+          names.add(device.name);
+        }
+      }
+    }
+    if (ensureName != null && !names.contains(ensureName)) {
+      names.add(ensureName);
+    }
+    if (!listEquals(_connectedDeviceNames, names)) {
+      _connectedDeviceNames = names;
+      notifyListeners();
     }
   }
 

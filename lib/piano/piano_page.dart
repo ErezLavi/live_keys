@@ -14,11 +14,8 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 
-//TODO: 2. menu - Show chords in all inversions + scales widget
-//TODO: 3. switch sf2 + show connected devices on menu
-//TODO: 4. games - play given chord/scale/note by its name/clef/sound.(3+)
-//TODO: 5. settings widget - adjust color, layout and more...
-//TODO: 6. support scales in chord_detector and top_bar
+//TODO: 4. settings widget - adjust color, sf2, show keyboard mapping...
+//TODO: 5. games - play given chord/scale/note by its name/clef/sound.(3+)
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
@@ -103,6 +100,7 @@ class _PianoPageState extends State<PianoPage> {
                   onChordCleared: _controller.clearSelectedChord,
                   onScaleSelected: _controller.onScaleSelected,
                   onScaleCleared: _controller.clearSelectedScale,
+                  deviceNames: _controller.connectedDeviceNames,
                 ),
               ),
             ),

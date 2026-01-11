@@ -33,19 +33,22 @@ class PianoPageController extends ChangeNotifier {
   List<NotePosition> get selectedScaleNotes => _selectedScale.notes;
   NoteRange get noteRange => fullRange;
   int get keyboardOctave => _keyboardOctave;
-  int get selectedChordInversion => _selectedChord.inversion;
-  int get selectedChordRootPc => _selectedChord.rootPc ?? 0;
-  String get selectedChordType => _selectedChord.type;
-  int get selectedScaleRootPc => _selectedScale.rootPc ?? 0;
-  String get selectedScaleType => _selectedScale.type;
-  List<String> get connectedDeviceNames =>
-      List.unmodifiable(_connectedDeviceNames);
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
     combined.addAll(_selectedChord.notes);
     combined.addAll(_selectedScale.notes);
     return combined.toList();
   }
+  // Selected chord
+  int get selectedChordInversion => _selectedChord.inversion;
+  int get selectedChordRootPc => _selectedChord.rootPc ?? 0;
+  String get selectedChordType => _selectedChord.type;
+  // Selected scale
+  int get selectedScaleRootPc => _selectedScale.rootPc ?? 0;
+  String get selectedScaleType => _selectedScale.type;
+  // Connected devices
+  List<String> get connectedDeviceNames =>
+      List.unmodifiable(_connectedDeviceNames);
 
   void _updateChord() {
     final detected = ChordDetector.detect(_pressedNotes);

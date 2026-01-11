@@ -34,6 +34,16 @@ class _ScalesGridState extends State<ScalesGrid> {
   }
 
   @override
+  void didUpdateWidget(covariant ScalesGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialRootPc != widget.initialRootPc ||
+        oldWidget.initialScaleType != widget.initialScaleType) {
+      _rootPc = widget.initialRootPc;
+      _scaleType = widget.initialScaleType;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final rootNames =
         List<int>.generate(12, (index) => index).map(Constants.noteName).toList();
@@ -55,7 +65,7 @@ class _ScalesGridState extends State<ScalesGrid> {
                 children: [
                   Spacer(),
                   TextButton.icon(
-                    onPressed: widget.onScaleCleared,
+                    onPressed: _clearSelection,
                     icon: const Icon(Icons.clear),
                     label: const Text('Clear'),
                   ),
@@ -122,6 +132,14 @@ class _ScalesGridState extends State<ScalesGrid> {
       _scaleType = scaleType;
     });
     widget.onScaleSelected?.call(_rootPc, _scaleType);
+  }
+
+  void _clearSelection() {
+    setState(() {
+      _rootPc = 0;
+      _scaleType = 'major';
+    });
+    widget.onScaleCleared?.call();
   }
 
   String _labelForScaleType(String type) {

@@ -15,7 +15,8 @@ class PianoPage extends StatefulWidget {
 }
 //TODO: fork piano package and delete custom piano widgets
 //TODO: add change octave buttons
-//TODO: settings widget - adjust color, sf2 etc ...
+//TODO: add b support based on the chord root
+//TODO: settings widget - choose color and sf2's
 //TODO: games - play given chord/scale/note by its name/clef/sound.(3+)
 
 class _PianoPageState extends State<PianoPage> {
@@ -103,10 +104,19 @@ class _PianoPageState extends State<PianoPage> {
                   vertical: verticalPadding,
                 ),
                 child: TopMenuBar(
-                  onChordSelected: _controller.onChordSelected,
-                  onChordCleared: _controller.clearSelectedChord,
-                  onScaleSelected: _controller.onScaleSelected,
-                  onScaleCleared: _controller.clearSelectedScale,
+                  chordMenu: ChordMenuState(
+                    onChordSelected: _controller.onChordSelected,
+                    onChordCleared: _controller.clearSelectedChord,
+                    initialRootPc: _controller.selectedChordRootPc,
+                    initialChordType: _controller.selectedChordType,
+                    initialChordInversion: _controller.selectedChordInversion,
+                  ),
+                  scaleMenu: ScaleMenuState(
+                    onScaleSelected: _controller.onScaleSelected,
+                    onScaleCleared: _controller.clearSelectedScale,
+                    initialRootPc: _controller.selectedScaleRootPc,
+                    initialScaleType: _controller.selectedScaleType,
+                  ),
                   deviceNames: _controller.connectedDeviceNames,
                 ),
               ),

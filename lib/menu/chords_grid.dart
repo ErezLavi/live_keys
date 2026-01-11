@@ -43,6 +43,19 @@ class _ChordsGridState extends State<ChordsGrid> {
   }
 
   @override
+  void didUpdateWidget(covariant ChordsGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialRootPc != widget.initialRootPc ||
+        oldWidget.initialChordType != widget.initialChordType ||
+        oldWidget.initialInversion != widget.initialInversion) {
+      _rootPc = widget.initialRootPc;
+      _chordType = widget.initialChordType;
+      _inversion = widget.initialInversion;
+      _clampInversion();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final rootNames =
         List<int>.generate(12, (index) => index).map(Constants.noteName).toList();
@@ -67,7 +80,7 @@ class _ChordsGridState extends State<ChordsGrid> {
                 children: [
                   Spacer(),
                   TextButton.icon(
-                    onPressed: widget.onChordCleared,
+                    onPressed: _clearSelection,
                     icon: const Icon(Icons.clear),
                     label: const Text('Clear'),
                   ),
@@ -162,6 +175,15 @@ class _ChordsGridState extends State<ChordsGrid> {
       _inversion = inversion;
     });
     widget.onChordSelected?.call(_rootPc, _chordType, _inversion);
+  }
+
+  void _clearSelection() {
+    setState(() {
+      _rootPc = 0;
+      _chordType = '';
+      _inversion = 0;
+    });
+    widget.onChordCleared?.call();
   }
 
   int _maxInversion() {

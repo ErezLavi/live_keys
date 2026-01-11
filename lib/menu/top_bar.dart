@@ -2,15 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:piano_app/menu/chords_grid.dart';
 import 'package:piano_app/menu/scales_grid.dart';
 
+class ChordMenuState {
+  final OnChordSelected? onChordSelected;
+  final VoidCallback? onChordCleared;
+  final int initialRootPc;
+  final String initialChordType;
+  final int initialChordInversion;
+
+  const ChordMenuState({
+    this.onChordSelected,
+    this.onChordCleared,
+    this.initialRootPc = 0,
+    this.initialChordType = '',
+    this.initialChordInversion = 0,
+  });
+}
+
+class ScaleMenuState {
+  final OnScaleSelected? onScaleSelected;
+  final VoidCallback? onScaleCleared;
+  final int initialRootPc;
+  final String initialScaleType;
+
+  const ScaleMenuState({
+    this.onScaleSelected,
+    this.onScaleCleared,
+    this.initialRootPc = 0,
+    this.initialScaleType = 'major',
+  });
+}
+
 class TopMenuBar extends StatelessWidget {
   final VoidCallback? onShowChordInversions;
   final VoidCallback? onShowScales;
   final VoidCallback? onKeyboardLayout;
   final VoidCallback? onColors;
-  final OnChordSelected? onChordSelected;
-  final VoidCallback? onChordCleared;
-  final OnScaleSelected? onScaleSelected;
-  final VoidCallback? onScaleCleared;
+  final ChordMenuState chordMenu;
+  final ScaleMenuState scaleMenu;
   final List<String> deviceNames;
 
   const TopMenuBar({
@@ -19,10 +47,8 @@ class TopMenuBar extends StatelessWidget {
     this.onShowScales,
     this.onKeyboardLayout,
     this.onColors,
-    this.onChordSelected,
-    this.onChordCleared,
-    this.onScaleSelected,
-    this.onScaleCleared,
+    this.chordMenu = const ChordMenuState(),
+    this.scaleMenu = const ScaleMenuState(),
     required this.deviceNames,
   });
 
@@ -68,8 +94,11 @@ class TopMenuBar extends StatelessWidget {
                   },
                   menuChildren: [
                     ChordsGrid(
-                      onChordSelected: onChordSelected,
-                      onChordCleared: onChordCleared,
+                      onChordSelected: chordMenu.onChordSelected,
+                      onChordCleared: chordMenu.onChordCleared,
+                      initialRootPc: chordMenu.initialRootPc,
+                      initialChordType: chordMenu.initialChordType,
+                      initialInversion: chordMenu.initialChordInversion,
                     ),
                   ],
                 ),
@@ -92,8 +121,10 @@ class TopMenuBar extends StatelessWidget {
                   },
                   menuChildren: [
                     ScalesGrid(
-                      onScaleSelected: onScaleSelected,
-                      onScaleCleared: onScaleCleared,
+                      onScaleSelected: scaleMenu.onScaleSelected,
+                      onScaleCleared: scaleMenu.onScaleCleared,
+                      initialRootPc: scaleMenu.initialRootPc,
+                      initialScaleType: scaleMenu.initialScaleType,
                     ),
                   ],
                 ),

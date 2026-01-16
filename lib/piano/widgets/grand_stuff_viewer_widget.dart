@@ -6,12 +6,14 @@ class GrandStaffViewerWidget extends StatelessWidget {
   final Color clefColor;
   final Color noteColor;
   final List<NotePosition> pressedNotes;
+  final bool useAlternativeAccidentals;
 
   const GrandStaffViewerWidget({
     super.key,
     this.clefColor = Colors.black,
     this.noteColor = Colors.black,
     this.pressedNotes = const [],
+    this.useAlternativeAccidentals = false,
   });
 
   List<NoteImage> _filterNotesForClef(Clef clef, NoteRange range) {
@@ -43,6 +45,7 @@ class GrandStaffViewerWidget extends StatelessWidget {
               noteImages: trebleNotes,
               clefColor: clefColor,
               noteColor: noteColor,
+              useAlternativeAccidentals: useAlternativeAccidentals,
               size: Size(400, 150),
             ),
           ),
@@ -53,6 +56,7 @@ class GrandStaffViewerWidget extends StatelessWidget {
               noteImages: bassNotes,
               clefColor: clefColor,
               noteColor: noteColor,
+              useAlternativeAccidentals: useAlternativeAccidentals,
               size: Size(400, 150),
             ),
           ),

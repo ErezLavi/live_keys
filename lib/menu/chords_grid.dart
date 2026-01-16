@@ -14,6 +14,7 @@ class ChordsGrid extends StatefulWidget {
   final int initialRootPc;
   final String initialChordType;
   final int initialInversion;
+  final bool useFlats;
 
   const ChordsGrid({
     super.key,
@@ -22,6 +23,7 @@ class ChordsGrid extends StatefulWidget {
     this.initialRootPc = 0,
     this.initialChordType = '',
     this.initialInversion = 0,
+    this.useFlats = false,
   });
 
   @override
@@ -57,8 +59,9 @@ class _ChordsGridState extends State<ChordsGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final rootNames =
-        List<int>.generate(12, (index) => index).map(Constants.noteName).toList();
+    final rootNames = List<int>.generate(12, (index) => index)
+        .map((pc) => Constants.noteName(pc, useFlats: widget.useFlats))
+        .toList();
     final chordTypes = Constants.chordDB.keys
         .where((type) => (Constants.chordRank[type] ?? 999) <= 27)
         .toList();

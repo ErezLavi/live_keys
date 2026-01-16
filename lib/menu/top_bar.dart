@@ -40,6 +40,7 @@ class TopMenuBar extends StatelessWidget {
   final ChordMenuState chordMenu;
   final ScaleMenuState scaleMenu;
   final List<String> deviceNames;
+  final bool useFlats;
 
   const TopMenuBar({
     super.key,
@@ -50,6 +51,7 @@ class TopMenuBar extends StatelessWidget {
     this.chordMenu = const ChordMenuState(),
     this.scaleMenu = const ScaleMenuState(),
     required this.deviceNames,
+    this.useFlats = false,
   });
 
   @override
@@ -99,6 +101,7 @@ class TopMenuBar extends StatelessWidget {
                       initialRootPc: chordMenu.initialRootPc,
                       initialChordType: chordMenu.initialChordType,
                       initialInversion: chordMenu.initialChordInversion,
+                      useFlats: useFlats,
                     ),
                   ],
                 ),
@@ -125,6 +128,7 @@ class TopMenuBar extends StatelessWidget {
                       onScaleCleared: scaleMenu.onScaleCleared,
                       initialRootPc: scaleMenu.initialRootPc,
                       initialScaleType: scaleMenu.initialScaleType,
+                      useFlats: useFlats,
                     ),
                   ],
                 ),

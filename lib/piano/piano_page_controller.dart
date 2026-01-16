@@ -23,6 +23,7 @@ class PianoPageController extends ChangeNotifier {
 
   // Variables
   int _keyboardOctave = 4;
+  bool _useFlats = false;
   String currentChord = '';
   final SelectedChord _selectedChord = SelectedChord();
   final SelectedScale _selectedScale = SelectedScale();
@@ -33,6 +34,7 @@ class PianoPageController extends ChangeNotifier {
   List<NotePosition> get selectedScaleNotes => _selectedScale.notes;
   NoteRange get noteRange => fullRange;
   int get keyboardOctave => _keyboardOctave;
+  bool get useFlats => _useFlats;
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
     combined.addAll(_selectedChord.notes);
@@ -51,8 +53,16 @@ class PianoPageController extends ChangeNotifier {
       List.unmodifiable(_connectedDeviceNames);
 
   void _updateChord() {
-    final detected = ChordDetector.detect(_pressedNotes);
+    final detected =
+        ChordDetector.detect(_pressedNotes, useFlats: _useFlats);
     currentChord = detected?.name ?? "";
+  }
+
+  void setUseFlats(bool value) {
+    if (_useFlats == value) return;
+    _useFlats = value;
+    _updateChord();
+    notifyListeners();
   }
 
   (String, String) splitChordName(String chord) {

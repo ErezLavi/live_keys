@@ -9,6 +9,7 @@ class ScalesGrid extends StatefulWidget {
   final OnScaleCleared? onScaleCleared;
   final int initialRootPc;
   final String initialScaleType;
+  final bool useFlats;
 
   const ScalesGrid({
     super.key,
@@ -16,6 +17,7 @@ class ScalesGrid extends StatefulWidget {
     this.onScaleCleared,
     this.initialRootPc = 0,
     this.initialScaleType = 'major',
+    this.useFlats = false,
   });
 
   @override
@@ -45,8 +47,9 @@ class _ScalesGridState extends State<ScalesGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final rootNames =
-        List<int>.generate(12, (index) => index).map(Constants.noteName).toList();
+    final rootNames = List<int>.generate(12, (index) => index)
+        .map((pc) => Constants.noteName(pc, useFlats: widget.useFlats))
+        .toList();
     final scaleTypes = Constants.scaleDB.keys.toList();
 
     return Material(

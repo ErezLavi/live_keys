@@ -11,6 +11,7 @@ class CustomClefImage extends StatelessWidget {
   final List<NoteImage> noteImages;
   final Color clefColor;
   final Color noteColor;
+  final bool useAlternativeAccidentals;
 
   const CustomClefImage({
     super.key,
@@ -21,6 +22,7 @@ class CustomClefImage extends StatelessWidget {
     required this.noteColor,
     this.size = Size.zero,
     NoteRange? noteRangeToClip,
+    this.useAlternativeAccidentals = false,
   }) : noteRangeToClip = noteRangeToClip ?? noteRange;
 
   @override
@@ -34,6 +36,7 @@ class CustomClefImage extends StatelessWidget {
             noteRangeToClip: noteRangeToClip,
             lineHeight: 1,
             noteImages: noteImages,
+            useAlternativeAccidentals: useAlternativeAccidentals,
           ),
           size: size,
         ),

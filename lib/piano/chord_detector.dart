@@ -19,7 +19,8 @@ class Candidate {
 
 class ChordDetector {
   /// Main entry point
-  static DetectedChord? detect(Set<NotePosition> pressed) {
+  static DetectedChord? detect(Set<NotePosition> pressed,
+      {bool useFlats = false}) {
     final List<int> pcs = pressed
         .map((e) => e.pitch % 12)
         .toSet()
@@ -97,6 +98,7 @@ class ChordDetector {
         bassPc,
         best.type,
         playedIntervals,
+        useFlats: useFlats,
       ),
       root: best.root,
       bass: bassPc,
@@ -154,13 +156,14 @@ class ChordDetector {
     int bassPc,
     String chordType,
     Set<int> playedIntervals,
+    {bool useFlats = false}
   ) {
-    final rootName = Constants.noteName(rootPc);
+    final rootName = Constants.noteName(rootPc, useFlats: useFlats);
     String name = "$rootName$chordType";
 
     if (bassPc == rootPc) return name;
 
-    final bassName = Constants.noteName(bassPc);
+    final bassName = Constants.noteName(bassPc, useFlats: useFlats);
     return "$name/$bassName";
   }
 }

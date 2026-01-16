@@ -19,6 +19,7 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
   final int lineHeight;
   final Color clefColor;
   final Color noteColor;
+  final bool useAlternativeAccidentals;
 
   /// Satisfies `EquatableMixin` and used in shouldRepaint for redraw efficiency
   @override
@@ -31,6 +32,7 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
         lineHeight,
         clefColor,
         noteColor,
+        useAlternativeAccidentals,
       ];
 
   final Paint _linePaint;
@@ -51,6 +53,7 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
     this.clefColor = Colors.black,
     this.noteColor = Colors.black,
     this.lineHeight = 1,
+    this.useAlternativeAccidentals = false,
   })  : _naturalPositions = noteRange.naturalPositions,
         _linePaint = Paint()
           ..color = clefColor
@@ -130,7 +133,11 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
         (firstLineIndex + (lastLineIndex - firstLineIndex - 1) / 2).floor();
 
     for (final noteImage in noteImages) {
-      final noteIndex = naturalPositionOf(noteImage.notePosition);
+      final displayNotePosition = useAlternativeAccidentals
+          ? noteImage.notePosition.alternativeAccidental ??
+              noteImage.notePosition
+          : noteImage.notePosition;
+      final noteIndex = naturalPositionOf(displayNotePosition);
       if (noteIndex == -1) {
         continue;
       }
@@ -170,13 +177,13 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
       _tailPaint.color = noteImage.color ?? noteColor;
       canvas.drawLine(tailFrom, tailTo, _tailPaint);
 
-      if (noteImage.notePosition.accidental != Accidental.None) {
-        if (_accidentalSymbolPainters[noteImage.notePosition.accidental] ==
+      if (displayNotePosition.accidental != Accidental.None) {
+        if (_accidentalSymbolPainters[displayNotePosition.accidental] ==
             null) {
-          _accidentalSymbolPainters[noteImage.notePosition.accidental] =
+          _accidentalSymbolPainters[displayNotePosition.accidental] =
               TextPainter(
                   text: TextSpan(
-                      text: noteImage.notePosition.accidental.symbol,
+                      text: displayNotePosition.accidental.symbol,
                       style: TextStyle(
                           fontSize: ovalHeight * 2,
                           color: noteImage.color ?? noteColor)),
@@ -184,7 +191,7 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
                 ..layout();
         }
 
-        _accidentalSymbolPainters[noteImage.notePosition.accidental]?.paint(
+        _accidentalSymbolPainters[displayNotePosition.accidental]?.paint(
             canvas,
             ovalRect.topLeft.translate(
               -ovalHeight,

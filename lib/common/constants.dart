@@ -68,6 +68,7 @@ class Constants {
     "7b5":    {4, 6, 10},
     "7#5":    {4, 8, 10},
     "maj7#5": {4, 8, 11},
+    "maj7sus4": {5, 7, 11},
     "maj9":   {4, 7, 11, 2},
   };
 
@@ -95,6 +96,7 @@ class Constants {
     "sus2": {2},
     "sus4": {5},
     "7sus4": {5},
+    "maj7sus4": {5, 11},
 
     // Altered fifths
     "aug": {8},
@@ -144,6 +146,7 @@ class Constants {
     "7#9": 36,
     "7#11": 37,
     "7b13": 38,
+    "maj7sus4": 39,
   };
 
   static const sharpNames = [

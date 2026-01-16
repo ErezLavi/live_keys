@@ -92,6 +92,8 @@ class CustomInteractivePiano extends StatefulWidget {
 class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
   /// We group notes into blocks of contiguous accidentals, since they need to be stacked
   late List<List<NotePosition>> _noteGroups;
+  late Set<int> _highlightedPitches;
+  late Set<int> _chordHighlightedPitches;
 
   ScrollController? _scrollController;
   double _lastWidth = 0.0, _lastKeyWidth = 0.0;
@@ -99,6 +101,7 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
   @override
   void initState() {
     _updateNotePositions();
+    _updateHighlights();
     super.initState();
   }
 
@@ -114,6 +117,10 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
         oldWidget.useAlternativeAccidentals !=
             widget.useAlternativeAccidentals) {
       _updateNotePositions();
+    }
+    if (oldWidget.highlightedNotes != widget.highlightedNotes ||
+        oldWidget.chordHighlightedNotes != widget.chordHighlightedNotes) {
+      _updateHighlights();
     }
 
     final noteToScrollTo = widget.noteToScrollTo;
@@ -140,7 +147,8 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
   }
 
   _updateNotePositions() {
-    final notePositions = widget.noteRange.allPositions;
+    final notePositions =
+        List<NotePosition>.from(widget.noteRange.allPositions);
 
     if (widget.useAlternativeAccidentals) {
       for (int i = 0; i < notePositions.length; i++) {
@@ -154,6 +162,13 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
     note.accidental == Accidental.None &&
         notePositions[index - 1].accidental == Accidental.None)
         .toList();
+  }
+
+  void _updateHighlights() {
+    _highlightedPitches =
+        widget.highlightedNotes.map((note) => note.pitch).toSet();
+    _chordHighlightedPitches =
+        widget.chordHighlightedNotes.map((note) => note.pitch).toSet();
   }
 
   @override
@@ -203,13 +218,13 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
                             hideNoteName: widget.hideNoteNames,
                             isAnimated: widget
                                 .animateHighlightedNotes &&
-                                widget.highlightedNotes.contains(note),
+                                _highlightedPitches.contains(note.pitch),
                             highlightColor:
-                            widget.highlightedNotes.contains(note)
+                            _highlightedPitches.contains(note.pitch)
                                 ? widget.highlightColor
                                 : null,
-                            showChordMarker: widget.chordHighlightedNotes
-                                .contains(note),
+                            showChordMarker:
+                                _chordHighlightedPitches.contains(note.pitch),
                             keyWidth: _lastKeyWidth,
                             onTapDown: _onNotePressed(note),
                             onTapUp: _onNoteReleased(note)))
@@ -232,16 +247,15 @@ class _CustomInteractivePianoState extends State<CustomInteractivePiano> {
                                     hideNoteName: widget.hideNoteNames,
                                     isAnimated: widget
                                         .animateHighlightedNotes &&
-                                        widget.highlightedNotes
-                                            .contains(note),
-                                    highlightColor: widget
-                                        .highlightedNotes
-                                        .contains(note)
-                                        ? widget.highlightColor
-                                        : null,
-                                    showChordMarker: widget
-                                        .chordHighlightedNotes
-                                        .contains(note),
+                                        _highlightedPitches
+                                            .contains(note.pitch),
+                                    highlightColor:
+                                        _highlightedPitches.contains(note.pitch)
+                                            ? widget.highlightColor
+                                            : null,
+                                    showChordMarker:
+                                        _chordHighlightedPitches
+                                            .contains(note.pitch),
                                     keyWidth: _lastKeyWidth,
                                     onTapDown: _onNotePressed(note),
                                     onTapUp: _onNoteReleased(note)))

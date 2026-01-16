@@ -13,10 +13,9 @@ class PianoPage extends StatefulWidget {
   @override
   State<PianoPage> createState() => _PianoPageState();
 }
-//TODO: fork piano package and delete custom piano widgets
-//TODO: add change octave buttons
-//TODO: add b support based on the chord root
-//TODO: settings widget - choose color and sf2's
+//TODO: add more chords support and detection bugs fixes
+//TODO: add change octave buttons / support midi octave change
+//TODO: settings widget - change color and sf2's
 //TODO: games - play given chord/scale/note by its name/clef/sound.(3+)
 
 class _PianoPageState extends State<PianoPage> {
@@ -49,6 +48,11 @@ class _PianoPageState extends State<PianoPage> {
     final keyWidth = (screenWidth / 20).clamp(24.0, 60.0);
     final horizontalPadding = (screenSize.width * 0.04).clamp(12.0, 32.0);
     final verticalPadding = (screenSize.height * 0.02).clamp(8.0, 16.0);
+    final isCompact = screenWidth < 840 || screenSize.height < 500;
+    final toggleConstraints = BoxConstraints(
+      minWidth: isCompact ? 36 : 48,
+      minHeight: isCompact ? 36 : 48,
+    );
 
     return Scaffold(
       body: Stack(
@@ -64,6 +68,7 @@ class _PianoPageState extends State<PianoPage> {
                     children: [
                       GrandStaffViewerWidget(
                         pressedNotes: _controller.pressedNotes,
+                        useAlternativeAccidentals: _controller.useFlats,
                       ),
                       Expanded(
                         child: ChordViewer(
@@ -88,6 +93,7 @@ class _PianoPageState extends State<PianoPage> {
                     accidentalColor: Colors.black,
                     keyWidth: keyWidth,
                     noteRange: _controller.noteRange,
+                    useAlternativeAccidentals: _controller.useFlats,
                     onNotePositionTapped: _controller.pressNote,
                     onNotePositionReleased: _controller.releaseNote,
                   ),
@@ -103,21 +109,71 @@ class _PianoPageState extends State<PianoPage> {
                   horizontal: horizontalPadding,
                   vertical: verticalPadding,
                 ),
-                child: TopMenuBar(
-                  chordMenu: ChordMenuState(
-                    onChordSelected: _controller.onChordSelected,
-                    onChordCleared: _controller.clearSelectedChord,
-                    initialRootPc: _controller.selectedChordRootPc,
-                    initialChordType: _controller.selectedChordType,
-                    initialChordInversion: _controller.selectedChordInversion,
-                  ),
-                  scaleMenu: ScaleMenuState(
-                    onScaleSelected: _controller.onScaleSelected,
-                    onScaleCleared: _controller.clearSelectedScale,
-                    initialRootPc: _controller.selectedScaleRootPc,
-                    initialScaleType: _controller.selectedScaleType,
-                  ),
-                  deviceNames: _controller.connectedDeviceNames,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 12,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        elevation: 0,
+                        borderRadius: BorderRadius.circular(12),
+                        child: ToggleButtons(
+                          constraints: toggleConstraints,
+                          borderRadius: BorderRadius.circular(12),
+                          isSelected: [
+                            !_controller.useFlats,
+                            _controller.useFlats
+                          ],
+                          onPressed: (index) =>
+                              _controller.setUseFlats(index == 1),
+                          children: [
+                            Text(
+                              '#',
+                              style: TextStyle(
+                                fontSize: isCompact ? 16 : 21,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              'b',
+                              style: TextStyle(
+                                fontSize: isCompact ? 16 : 21,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 36),
+                    TopMenuBar(
+                      chordMenu: ChordMenuState(
+                        onChordSelected: _controller.onChordSelected,
+                        onChordCleared: _controller.clearSelectedChord,
+                        initialRootPc: _controller.selectedChordRootPc,
+                        initialChordType: _controller.selectedChordType,
+                        initialChordInversion:
+                            _controller.selectedChordInversion,
+                      ),
+                      scaleMenu: ScaleMenuState(
+                        onScaleSelected: _controller.onScaleSelected,
+                        onScaleCleared: _controller.clearSelectedScale,
+                        initialRootPc: _controller.selectedScaleRootPc,
+                        initialScaleType: _controller.selectedScaleType,
+                      ),
+                      deviceNames: _controller.connectedDeviceNames,
+                      useFlats: _controller.useFlats,
+                    ),
+                  ],
                 ),
               ),
             ),

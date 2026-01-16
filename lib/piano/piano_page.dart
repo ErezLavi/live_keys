@@ -13,8 +13,8 @@ class PianoPage extends StatefulWidget {
   @override
   State<PianoPage> createState() => _PianoPageState();
 }
+//TODO: refactoring - split controller into smaller controllers and this page to smaller widgets
 //TODO: add more chords support and detection bugs fixes
-//TODO: add change octave buttons / support midi octave change
 //TODO: settings widget - change color and sf2's
 //TODO: games - play given chord/scale/note by its name/clef/sound.(3+)
 
@@ -112,6 +112,57 @@ class _PianoPageState extends State<PianoPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 12,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        elevation: 0,
+                        borderRadius: BorderRadius.circular(12),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                tooltip: 'Decrease Octave',
+                                iconSize: isCompact ? 18 : 24,
+                                padding: EdgeInsets.all(isCompact ? 6 : 8),
+                                constraints: toggleConstraints,
+                                onPressed: _controller.decrementOctave,
+                              ),
+                              Container(
+                                constraints: toggleConstraints,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${_controller.keyboardOctave}',
+                                  style: TextStyle(
+                                    fontSize: isCompact ? 16 : 21,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                tooltip: 'Increase Octave',
+                                iconSize: isCompact ? 18 : 24,
+                                padding: EdgeInsets.all(isCompact ? 6 : 8),
+                                constraints: toggleConstraints,
+                                onPressed: _controller.incrementOctave,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 36),
                     DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),

@@ -65,6 +65,24 @@ class PianoPageController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void incrementOctave() {
+    final newOctave = (_keyboardOctave + 1).clamp(0, 8).toInt();
+    if (newOctave != _keyboardOctave) {
+      _keyboardOctave = newOctave;
+      _rebuildSelectedHighlights();
+      notifyListeners();
+    }
+  }
+
+  void decrementOctave() {
+    final newOctave = (_keyboardOctave - 1).clamp(0, 8).toInt();
+    if (newOctave != _keyboardOctave) {
+      _keyboardOctave = newOctave;
+      _rebuildSelectedHighlights();
+      notifyListeners();
+    }
+  }
+
   (String, String) splitChordName(String chord) {
     if (chord.isEmpty) return ('', '');
     int rootLen = 1;
@@ -79,23 +97,13 @@ class PianoPageController extends ChangeNotifier {
 
   void handleKeyboardKey(KeyEvent event) {
     var updated = false;
-    var octaveChanged = false;
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.bracketLeft) {
-        final newOctave = (_keyboardOctave - 1).clamp(0, 8).toInt();
-        if (newOctave != _keyboardOctave) {
-          _keyboardOctave = newOctave;
-          updated = true;
-          octaveChanged = true;
-        }
+        decrementOctave();
+        return;
       } else if (event.logicalKey == LogicalKeyboardKey.bracketRight) {
-        final newOctave = (_keyboardOctave + 1).clamp(0, 8).toInt();
-        if (newOctave != _keyboardOctave) {
-
-          _keyboardOctave = newOctave;
-          updated = true;
-          octaveChanged = true;
-        }
+        incrementOctave();
+        return;
       } else {
         final offset = Constants.keyboardKeyOffsets[event.logicalKey];
         if (offset != null && !_activeKeyNotes.containsKey(event.logicalKey)) {
@@ -130,9 +138,6 @@ class PianoPageController extends ChangeNotifier {
     }
 
     if (updated) {
-      if (octaveChanged) {
-        _rebuildSelectedHighlights();
-      }
       notifyListeners();
       _updateChord();
     }

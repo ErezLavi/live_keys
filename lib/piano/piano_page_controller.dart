@@ -19,7 +19,7 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
-  List<String> _connectedDeviceNames = [''];
+  List<String> _connectedDeviceNames = [];
 
   // Variables
   int _keyboardOctave = 4;
@@ -414,7 +414,7 @@ class PianoPageController extends ChangeNotifier {
     List<MidiDevice>? devices, {
     String? ensureName,
   }) {
-    final names = <String>['Devices Keyboard'];
+    final names = <String>[];
     if (devices != null) {
       for (final device in devices) {
         if (device.connected) {
@@ -434,7 +434,7 @@ class PianoPageController extends ChangeNotifier {
   void _handleMidiPacket(MidiPacket packet) {
     final data = packet.data;
     if (data.length < 3) return;
-
+    debugPrint('MIDI data: ${data.join(', ')}');
     final status = data[0] & 0xF0;
     final key = data[1];
     final velocity = data[2];

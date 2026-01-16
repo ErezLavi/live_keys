@@ -136,7 +136,7 @@ class TopMenuBar extends StatelessWidget {
                   builder: (context, controller, _) {
                     return IconButton(
                       icon: const Icon(Icons.devices),
-                      tooltip: 'Devices',
+                      tooltip: 'MIDI Devices',
                       iconSize: iconSize,
                       padding: iconPadding,
                       constraints: buttonConstraints,
@@ -150,11 +150,17 @@ class TopMenuBar extends StatelessWidget {
                     );
                   },
                   menuChildren: [
-                    for (final device in deviceNames)
-                      MenuItemButton(
-                        onPressed: () {},
-                        child: Text(device),
-                      ),
+                    if (deviceNames.isEmpty)
+                      const MenuItemButton(
+                        onPressed: null,
+                        child: Text('No MIDI device connected'),
+                      )
+                    else
+                      for (final device in deviceNames)
+                        MenuItemButton(
+                          onPressed: () {},
+                          child: Text(device),
+                        ),
                   ],
                 ),
                 MenuAnchor(

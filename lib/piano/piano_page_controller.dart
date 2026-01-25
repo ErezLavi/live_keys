@@ -6,7 +6,7 @@ import 'package:piano/piano.dart';
 import 'package:piano_app/common/constants.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_midi_pro/flutter_midi_pro.dart';
-import 'chord_detector.dart';
+import '../common/chord_detector.dart';
 
 class PianoPageController extends ChangeNotifier {
   PianoPageController();

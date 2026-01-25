@@ -22,12 +22,12 @@ class ChordViewer extends StatelessWidget {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        final maxHeight = constraints.maxHeight.isFinite
-            ? constraints.maxHeight
-            : constraints.maxWidth;
-        final sizeBasis = math.min(constraints.maxWidth, maxHeight);
-        final scaledRootSize = (sizeBasis * 0.25).clamp(40.0, 140.0);
-        final scaledSuffixSize = (sizeBasis * 0.25).clamp(32.0, 120.0);
+        final sizeBasis = math.min(
+          constraints.maxWidth,
+          constraints.maxHeight * 1.7,
+        );
+        final scaledRootSize = (sizeBasis * 0.25).clamp(48.0, 130.0);
+        final scaledSuffixSize = (sizeBasis * 0.25).clamp(36.0, 115.0);
 
         return Align(
           alignment: Alignment.center,

@@ -24,6 +24,7 @@ class PianoPageController extends ChangeNotifier {
   // Variables
   int _keyboardOctave = 4;
   bool _useFlats = false;
+  bool _isMuted = false;
   String currentChord = '';
   final SelectedChord _selectedChord = SelectedChord();
   final SelectedScale _selectedScale = SelectedScale();
@@ -35,6 +36,7 @@ class PianoPageController extends ChangeNotifier {
   NoteRange get noteRange => fullRange;
   int get keyboardOctave => _keyboardOctave;
   bool get useFlats => _useFlats;
+  bool get isMuted => _isMuted;
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
     combined.addAll(_selectedChord.notes);
@@ -64,6 +66,23 @@ class PianoPageController extends ChangeNotifier {
     _updateChord();
     notifyListeners();
   }
+
+  void setMuted(bool value) {
+    if (_isMuted == value) return;
+    _isMuted = value;
+    if (_isMuted && sfId != null) {
+      for (final note in _pressedNotes) {
+        midi.stopNote(
+          channel: 0,
+          key: note.pitch,
+          sfId: sfId!,
+        );
+      }
+    }
+    notifyListeners();
+  }
+
+  void toggleMuted() => setMuted(!_isMuted);
 
   void incrementOctave() {
     final newOctave = (_keyboardOctave + 1).clamp(0, 8).toInt();
@@ -114,12 +133,14 @@ class PianoPageController extends ChangeNotifier {
             _pressedNotes.add(note);
             _activeKeyNotes[event.logicalKey] = note;
 
-            midi.playNote(
-              channel: 0,
-              key: note.pitch,
-              velocity: 100,
-              sfId: sfId!,
-            );
+            if (!_isMuted) {
+              midi.playNote(
+                channel: 0,
+                key: note.pitch,
+                velocity: 100,
+                sfId: sfId!,
+              );
+            }
             updated = true;
           }
         }
@@ -128,11 +149,13 @@ class PianoPageController extends ChangeNotifier {
       final note = _activeKeyNotes.remove(event.logicalKey);
       if (note != null) {
         _pressedNotes.remove(note);
-        midi.stopNote(
-          channel: 0,
-          key: note.pitch,
-          sfId: sfId!,
-        );
+        if (!_isMuted) {
+          midi.stopNote(
+            channel: 0,
+            key: note.pitch,
+            sfId: sfId!,
+          );
+        }
         updated = true;
       }
     }
@@ -319,12 +342,14 @@ class PianoPageController extends ChangeNotifier {
     if (!_pressedNotes.contains(position)) {
       _pressedNotes.add(position);
 
-      midi.playNote(
-        channel: 0,
-        key: position.pitch,
-        velocity: 100,
-        sfId: sfId!,
-      );
+      if (!_isMuted) {
+        midi.playNote(
+          channel: 0,
+          key: position.pitch,
+          velocity: 100,
+          sfId: sfId!,
+        );
+      }
 
       _updateChord();
       notifyListeners();
@@ -335,11 +360,13 @@ class PianoPageController extends ChangeNotifier {
     if (_pressedNotes.contains(position)) {
       _pressedNotes.remove(position);
 
-      midi.stopNote(
-        channel: 0,
-        key: position.pitch,
-        sfId: sfId!,
-      );
+      if (!_isMuted) {
+        midi.stopNote(
+          channel: 0,
+          key: position.pitch,
+          sfId: sfId!,
+        );
+      }
 
       _updateChord();
       notifyListeners();

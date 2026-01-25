@@ -204,7 +204,6 @@ class _ChordsGridState extends State<ChordsGrid> {
   String _labelForChordType(String type) {
     if (type.isEmpty) return 'Maj';
     if (type == 'm') return 'Min';
-    if (type == 'm7b5') return 'm7b5';
     return type;
   }
 }

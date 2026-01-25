@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piano_app/piano/custom_piano/custom_interactive_piano.dart';
+import 'package:piano_app/custom_piano/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
 import 'package:piano_app/piano/widgets/chord_viewer.dart';
@@ -223,6 +223,8 @@ class _PianoPageState extends State<PianoPage> {
                       ),
                       deviceNames: _controller.connectedDeviceNames,
                       useFlats: _controller.useFlats,
+                      isMuted: _controller.isMuted,
+                      onToggleMute: _controller.toggleMuted,
                     ),
                   ],
                 ),

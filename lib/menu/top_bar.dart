@@ -37,10 +37,12 @@ class TopMenuBar extends StatelessWidget {
   final VoidCallback? onShowScales;
   final VoidCallback? onKeyboardLayout;
   final VoidCallback? onColors;
+  final VoidCallback? onToggleMute;
   final ChordMenuState chordMenu;
   final ScaleMenuState scaleMenu;
   final List<String> deviceNames;
   final bool useFlats;
+  final bool isMuted;
 
   const TopMenuBar({
     super.key,
@@ -48,10 +50,12 @@ class TopMenuBar extends StatelessWidget {
     this.onShowScales,
     this.onKeyboardLayout,
     this.onColors,
+    this.onToggleMute,
     this.chordMenu = const ChordMenuState(),
     this.scaleMenu = const ScaleMenuState(),
     required this.deviceNames,
     this.useFlats = false,
+    this.isMuted = false,
   });
 
   @override
@@ -178,6 +182,21 @@ class TopMenuBar extends StatelessWidget {
                     MenuItemButton(
                       onPressed: onKeyboardLayout,
                       child: const Text('Sound'),
+                    ),
+                    MenuItemButton(
+                      closeOnActivate: false,
+                      onPressed: onToggleMute,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isMuted ? Icons.volume_off : Icons.volume_up,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(isMuted ? 'Unmute' : 'Mute'),
+                        ],
+                      ),
                     ),
                     MenuItemButton(
                       onPressed: onColors,

@@ -15,7 +15,7 @@ class PianoPage extends StatefulWidget {
 }
 //TODO: refactoring - split controller into smaller controllers and this page to smaller widgets
 //TODO: add more chords support and detection bugs fixes
-//TODO: settings widget - change color and sf2's
+//TODO: settings widget - change sf2's
 //TODO: games - play given chord/scale/note by its name/clef/sound.(3+)
 
 class _PianoPageState extends State<PianoPage> {
@@ -207,24 +207,7 @@ class _PianoPageState extends State<PianoPage> {
                     ),
                     SizedBox(width: 36),
                     TopMenuBar(
-                      chordMenu: ChordMenuState(
-                        onChordSelected: _controller.onChordSelected,
-                        onChordCleared: _controller.clearSelectedChord,
-                        initialRootPc: _controller.selectedChordRootPc,
-                        initialChordType: _controller.selectedChordType,
-                        initialChordInversion:
-                            _controller.selectedChordInversion,
-                      ),
-                      scaleMenu: ScaleMenuState(
-                        onScaleSelected: _controller.onScaleSelected,
-                        onScaleCleared: _controller.clearSelectedScale,
-                        initialRootPc: _controller.selectedScaleRootPc,
-                        initialScaleType: _controller.selectedScaleType,
-                      ),
-                      deviceNames: _controller.connectedDeviceNames,
-                      useFlats: _controller.useFlats,
-                      isMuted: _controller.isMuted,
-                      onToggleMute: _controller.toggleMuted,
+                      controller: _controller,
                     ),
                   ],
                 ),

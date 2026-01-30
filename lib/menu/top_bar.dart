@@ -1,61 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:piano_app/menu/chords_grid.dart';
 import 'package:piano_app/menu/scales_grid.dart';
-
-class ChordMenuState {
-  final OnChordSelected? onChordSelected;
-  final VoidCallback? onChordCleared;
-  final int initialRootPc;
-  final String initialChordType;
-  final int initialChordInversion;
-
-  const ChordMenuState({
-    this.onChordSelected,
-    this.onChordCleared,
-    this.initialRootPc = 0,
-    this.initialChordType = '',
-    this.initialChordInversion = 0,
-  });
-}
-
-class ScaleMenuState {
-  final OnScaleSelected? onScaleSelected;
-  final VoidCallback? onScaleCleared;
-  final int initialRootPc;
-  final String initialScaleType;
-
-  const ScaleMenuState({
-    this.onScaleSelected,
-    this.onScaleCleared,
-    this.initialRootPc = 0,
-    this.initialScaleType = 'major',
-  });
-}
+import 'package:piano_app/piano/piano_page_controller.dart';
 
 class TopMenuBar extends StatelessWidget {
-  final VoidCallback? onShowChordInversions;
-  final VoidCallback? onShowScales;
-  final VoidCallback? onKeyboardLayout;
-  final VoidCallback? onColors;
-  final VoidCallback? onToggleMute;
-  final ChordMenuState chordMenu;
-  final ScaleMenuState scaleMenu;
-  final List<String> deviceNames;
-  final bool useFlats;
-  final bool isMuted;
+  final PianoPageController controller;
 
   const TopMenuBar({
     super.key,
-    this.onShowChordInversions,
-    this.onShowScales,
-    this.onKeyboardLayout,
-    this.onColors,
-    this.onToggleMute,
-    this.chordMenu = const ChordMenuState(),
-    this.scaleMenu = const ScaleMenuState(),
-    required this.deviceNames,
-    this.useFlats = false,
-    this.isMuted = false,
+    required this.controller,
   });
 
   @override
@@ -100,12 +53,12 @@ class TopMenuBar extends StatelessWidget {
                   },
                   menuChildren: [
                     ChordsGrid(
-                      onChordSelected: chordMenu.onChordSelected,
-                      onChordCleared: chordMenu.onChordCleared,
-                      initialRootPc: chordMenu.initialRootPc,
-                      initialChordType: chordMenu.initialChordType,
-                      initialInversion: chordMenu.initialChordInversion,
-                      useFlats: useFlats,
+                      onChordSelected: controller.onChordSelected,
+                      onChordCleared: controller.clearSelectedChord,
+                      initialRootPc: controller.selectedChordRootPc,
+                      initialChordType: controller.selectedChordType,
+                      initialInversion: controller.selectedChordInversion,
+                      useFlats: controller.useFlats,
                     ),
                   ],
                 ),
@@ -128,11 +81,11 @@ class TopMenuBar extends StatelessWidget {
                   },
                   menuChildren: [
                     ScalesGrid(
-                      onScaleSelected: scaleMenu.onScaleSelected,
-                      onScaleCleared: scaleMenu.onScaleCleared,
-                      initialRootPc: scaleMenu.initialRootPc,
-                      initialScaleType: scaleMenu.initialScaleType,
-                      useFlats: useFlats,
+                      onScaleSelected: controller.onScaleSelected,
+                      onScaleCleared: controller.clearSelectedScale,
+                      initialRootPc: controller.selectedScaleRootPc,
+                      initialScaleType: controller.selectedScaleType,
+                      useFlats: controller.useFlats,
                     ),
                   ],
                 ),
@@ -154,13 +107,13 @@ class TopMenuBar extends StatelessWidget {
                     );
                   },
                   menuChildren: [
-                    if (deviceNames.isEmpty)
+                    if (controller.connectedDeviceNames.isEmpty)
                       const MenuItemButton(
                         onPressed: null,
                         child: Text('No MIDI device connected'),
                       )
                     else
-                      for (final device in deviceNames)
+                      for (final device in controller.connectedDeviceNames)
                         MenuItemButton(
                           onPressed: () {},
                           child: Text(device),
@@ -179,28 +132,66 @@ class TopMenuBar extends StatelessWidget {
                     );
                   },
                   menuChildren: [
-                    MenuItemButton(
-                      onPressed: onKeyboardLayout,
-                      child: const Text('Sound'),
+                    MenuAnchor(
+                      builder: (context, controller, _) {
+                        return MenuItemButton(
+                          closeOnActivate: false,
+                          onPressed: () {
+                            if (controller.isOpen) {
+                              controller.close();
+                            } else {
+                              controller.open();
+                            }
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.chevron_left, size: 18),
+                              const SizedBox(width: 6),
+                              const Text('Choose Sound'),
+                            ],
+                          ),
+                        );
+                      },
+                      menuChildren: [
+                        for (final soundFont
+                            in controller.availableSoundFonts)
+                          MenuItemButton(
+                            onPressed: () =>
+                                controller.setSoundFont(soundFont),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  soundFont.assetPath ==
+                                          controller.selectedSoundFont.assetPath
+                                      ? Icons.check
+                                      : null,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(soundFont.name),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                     MenuItemButton(
                       closeOnActivate: false,
-                      onPressed: onToggleMute,
+                      onPressed: controller.toggleMuted,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isMuted ? Icons.volume_off : Icons.volume_up,
+                            controller.isMuted
+                                ? Icons.volume_off
+                                : Icons.volume_up,
                             size: 18,
                           ),
                           const SizedBox(width: 8),
-                          Text(isMuted ? 'Unmute' : 'Mute'),
+                          Text(controller.isMuted ? 'Unmute' : 'Mute'),
                         ],
                       ),
-                    ),
-                    MenuItemButton(
-                      onPressed: onColors,
-                      child: const Text('Colors'),
                     ),
                   ],
                 ),

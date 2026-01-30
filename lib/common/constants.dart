@@ -3,7 +3,20 @@ import 'package:flutter/services.dart';
 
 class Constants {
   // sounds
-  static const String rhodesSoundFontAsset = 'assets/sf2/Rhodes.sf2';
+  static const SoundFontOption rhodesSoundFont = SoundFontOption(
+    id: 'rhodes',
+    name: 'Rhodes',
+    assetPath: 'assets/sf2/Rhodes.sf2',
+  );
+  static const SoundFontOption yamahaSoundFont = SoundFontOption(
+    id: 'yamaha',
+    name: 'Yamaha Piano',
+    assetPath: 'assets/sf2/yamaha_piano.sf2',
+  );
+  static const List<SoundFontOption> soundFonts = [
+    rhodesSoundFont,
+    yamahaSoundFont,
+  ];
 
   // colors
   static const Color playedNoteColor = Color(0xFF6E026F);
@@ -182,4 +195,16 @@ class Constants {
     adjusted.sort();
     return adjusted;
   }
+}
+
+class SoundFontOption {
+  final String id;
+  final String name;
+  final String assetPath;
+
+  const SoundFontOption({
+    required this.id,
+    required this.name,
+    required this.assetPath,
+  });
 }

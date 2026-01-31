@@ -39,25 +39,47 @@ class GrandStaffViewerWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
-            child: CustomClefImage(
-              clef: Clef.Treble,
-              noteRange: trebleRange,
-              noteImages: trebleNotes,
-              clefColor: clefColor,
-              noteColor: noteColor,
-              useAlternativeAccidentals: useAlternativeAccidentals,
-              size: Size(400, 150),
+            child: AspectRatio(
+              aspectRatio: 8/3,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final clefSize = Size(
+                    constraints.maxWidth,
+                    constraints.maxHeight,
+                  );
+                  return CustomClefImage(
+                    clef: Clef.Treble,
+                    noteRange: trebleRange,
+                    noteImages: trebleNotes,
+                    clefColor: clefColor,
+                    noteColor: noteColor,
+                    useAlternativeAccidentals: useAlternativeAccidentals,
+                    size: clefSize,
+                  );
+                },
+              ),
             ),
           ),
           Expanded(
-            child: CustomClefImage(
-              clef: Clef.Bass,
-              noteRange: bassRange,
-              noteImages: bassNotes,
-              clefColor: clefColor,
-              noteColor: noteColor,
-              useAlternativeAccidentals: useAlternativeAccidentals,
-              size: Size(400, 150),
+            child: AspectRatio(
+              aspectRatio: 8/3,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final clefSize = Size(
+                    constraints.maxWidth,
+                    constraints.maxHeight,
+                  );
+                  return CustomClefImage(
+                    clef: Clef.Bass,
+                    noteRange: bassRange,
+                    noteImages: bassNotes,
+                    clefColor: clefColor,
+                    noteColor: noteColor,
+                    useAlternativeAccidentals: useAlternativeAccidentals,
+                    size: clefSize,
+                  );
+                },
+              ),
             ),
           ),
         ],

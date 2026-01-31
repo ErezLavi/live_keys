@@ -5,35 +5,34 @@ import 'package:piano_app/piano/piano_page_controller.dart';
 
 class TopMenuBar extends StatelessWidget {
   final PianoPageController controller;
+  final bool isCompact;
 
   const TopMenuBar({
     super.key,
     required this.controller,
+    required this.isCompact,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isCompact = constraints.maxWidth < 840 || constraints.maxHeight < 500;
-        final iconSize = isCompact ? 18.0 : 32.0;
-        final iconPadding = EdgeInsets.all(isCompact ? 6 : 8);
-        final buttonConstraints = BoxConstraints(
-          minWidth: isCompact ? 36 : 48,
-          minHeight: isCompact ? 36 : 48,
-        );
+    final iconSize = isCompact ? 18.0 : 32.0;
+    final iconPadding = EdgeInsets.all(isCompact ? 4 : 8);
+    final buttonConstraints = BoxConstraints(
+      minWidth: isCompact ? 16 : 48,
+      minHeight: isCompact ? 16 : 48,
+    );
 
-        return Material(
-          elevation: 6,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4),
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: isCompact ? 2 : 4,
-              runSpacing: isCompact ? 2 : 4,
-              children: [
+    return Material(
+      elevation: 6,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 4),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: isCompact ? 2 : 4,
+          runSpacing: isCompact ? 2 : 4,
+          children: [
                 MenuAnchor(
                   builder: (context, controller, _) {
                     return IconButton(
@@ -196,10 +195,8 @@ class TopMenuBar extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

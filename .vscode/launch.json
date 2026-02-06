@@ -6,29 +6,44 @@
     "configurations": [
         {
             "name": "piano_app",
-            "cwd": "piano_app",
+            "program": "lib/main.dart",
             "request": "launch",
             "type": "dart"
         },
         {
+            "name": "piano_app (macOS)",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "macos"
+        },
+        {
+            "name": "piano_app (Android)",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "R5CRA1WZE6A"
+        },
+        {
+            "name": "piano_app (Android - iPlay 50)",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "T103064GB22503640134"
+        },
+        {
             "name": "piano_app (profile mode)",
-            "cwd": "piano_app",
+            "program": "lib/main.dart",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
             "name": "piano_app (release mode)",
-            "cwd": "piano_app",
+            "program": "lib/main.dart",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
-        },
-        {
-            "name": "piano_app_v2",
-            "cwd": "piano_app_v2",
-            "request": "launch",
-            "type": "dart"
         }
     ]
 }

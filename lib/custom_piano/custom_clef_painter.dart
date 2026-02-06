@@ -61,6 +61,21 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
         _notePaint = Paint(),
         _tailPaint = Paint()..strokeWidth = lineHeight.toDouble();
 
+  String _accidentalGlyph(Accidental accidental) {
+    final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+    if (!isAndroid) {
+      return accidental.symbol;
+    }
+    switch (accidental) {
+      case Accidental.Flat:
+        return 'b';
+      case Accidental.Sharp:
+        return '#';
+      default:
+        return accidental.symbol;
+    }
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final bounds = padding.deflateRect(Offset.zero & size);
@@ -183,7 +198,7 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
           _accidentalSymbolPainters[displayNotePosition.accidental] =
               TextPainter(
                   text: TextSpan(
-                      text: displayNotePosition.accidental.symbol,
+                      text: _accidentalGlyph(displayNotePosition.accidental),
                       style: TextStyle(
                           fontSize: ovalHeight * 2,
                           color: noteImage.color ?? noteColor)),

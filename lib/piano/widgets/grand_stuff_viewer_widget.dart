@@ -41,44 +41,26 @@ class GrandStaffViewerWidget extends StatelessWidget {
           Expanded(
             child: AspectRatio(
               aspectRatio: 8/3,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final clefSize = Size(
-                    constraints.maxWidth,
-                    constraints.maxHeight,
-                  );
-                  return CustomClefImage(
-                    clef: Clef.Treble,
-                    noteRange: trebleRange,
-                    noteImages: trebleNotes,
-                    clefColor: clefColor,
-                    noteColor: noteColor,
-                    useAlternativeAccidentals: useAlternativeAccidentals,
-                    size: clefSize,
-                  );
-                },
+              child: CustomClefImage(
+                clef: Clef.Treble,
+                noteRange: trebleRange,
+                noteImages: trebleNotes,
+                clefColor: clefColor,
+                noteColor: noteColor,
+                useAlternativeAccidentals: useAlternativeAccidentals,
               ),
             ),
           ),
           Expanded(
             child: AspectRatio(
               aspectRatio: 8/3,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final clefSize = Size(
-                    constraints.maxWidth,
-                    constraints.maxHeight,
-                  );
-                  return CustomClefImage(
-                    clef: Clef.Bass,
-                    noteRange: bassRange,
-                    noteImages: bassNotes,
-                    clefColor: clefColor,
-                    noteColor: noteColor,
-                    useAlternativeAccidentals: useAlternativeAccidentals,
-                    size: clefSize,
-                  );
-                },
+              child: CustomClefImage(
+                clef: Clef.Bass,
+                noteRange: bassRange,
+                noteImages: bassNotes,
+                clefColor: clefColor,
+                noteColor: noteColor,
+                useAlternativeAccidentals: useAlternativeAccidentals,
               ),
             ),
           ),

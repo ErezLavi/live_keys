@@ -4,7 +4,6 @@ import 'package:piano/piano.dart';
 import 'custom_clef_painter.dart';
 
 class CustomClefImage extends StatelessWidget {
-  final Size size;
   final Clef clef;
   final NoteRange noteRange;
   final NoteRange noteRangeToClip;
@@ -20,7 +19,6 @@ class CustomClefImage extends StatelessWidget {
     required this.noteImages,
     required this.clefColor,
     required this.noteColor,
-    this.size = Size.zero,
     NoteRange? noteRangeToClip,
     this.useAlternativeAccidentals = false,
   }) : noteRangeToClip = noteRangeToClip ?? noteRange;
@@ -38,7 +36,6 @@ class CustomClefImage extends StatelessWidget {
             noteImages: noteImages,
             useAlternativeAccidentals: useAlternativeAccidentals,
           ),
-          size: size,
         ),
       );
 }

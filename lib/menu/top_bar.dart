@@ -15,12 +15,12 @@ class TopMenuBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconSize = isCompact ? 18.0 : 32.0;
-    final iconPadding = EdgeInsets.all(isCompact ? 4 : 8);
-    final buttonConstraints = BoxConstraints(
-      minWidth: isCompact ? 16 : 48,
-      minHeight: isCompact ? 16 : 48,
-    );
+    final iconSize = isCompact ? 20.0 : 32.0;
+    final iconPadding = EdgeInsets.all(isCompact ? 2 : 8);
+    // final buttonConstraints = BoxConstraints(
+    //   //minWidth: isCompact ? 12 : 48,
+    //   //minHeight: isCompact ? 10 : 48,
+    // );
 
     return Material(
       elevation: 6,
@@ -30,8 +30,8 @@ class TopMenuBar extends StatelessWidget {
         child: Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: isCompact ? 2 : 4,
-          runSpacing: isCompact ? 2 : 4,
+          spacing: isCompact ? 1 : 4,
+          runSpacing: isCompact ? 1 : 4,
           children: [
                 MenuAnchor(
                   builder: (context, controller, _) {
@@ -40,7 +40,6 @@ class TopMenuBar extends StatelessWidget {
                       tooltip: 'Chords',
                       iconSize: iconSize,
                       padding: iconPadding,
-                      constraints: buttonConstraints,
                       onPressed: () {
                         if (controller.isOpen) {
                           controller.close();
@@ -68,7 +67,6 @@ class TopMenuBar extends StatelessWidget {
                       tooltip: 'Scales',
                       iconSize: iconSize,
                       padding: iconPadding,
-                      constraints: buttonConstraints,
                       onPressed: () {
                         if (controller.isOpen) {
                           controller.close();
@@ -95,7 +93,6 @@ class TopMenuBar extends StatelessWidget {
                       tooltip: 'MIDI Devices',
                       iconSize: iconSize,
                       padding: iconPadding,
-                      constraints: buttonConstraints,
                       onPressed: () {
                         if (controller.isOpen) {
                           controller.close();
@@ -126,7 +123,6 @@ class TopMenuBar extends StatelessWidget {
                       tooltip: 'Settings',
                       iconSize: iconSize,
                       padding: iconPadding,
-                      constraints: buttonConstraints,
                       onPressed: controller.open,
                     );
                   },

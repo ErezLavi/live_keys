@@ -19,12 +19,7 @@ class GrandStaffViewerWidget extends StatelessWidget {
   List<NoteImage> _filterNotesForClef(Clef clef, NoteRange range) {
     return pressedNotes
         .where((note) => range.contains(note))
-        .map((note) {
-          final displayNote = useAlternativeAccidentals
-              ? note.alternativeAccidental ?? note
-              : note;
-          return NoteImage(notePosition: displayNote);
-        })
+        .map((note) => NoteImage(notePosition: note))
         .toList();
   }
 

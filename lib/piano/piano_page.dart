@@ -117,21 +117,21 @@ class _PianoPageState extends State<PianoPage> {
                               IconButton(
                                 icon: const Icon(Icons.remove),
                                 tooltip: 'Decrease Octave',
-                                iconSize: isCompact ? 12 : 24,
+                                iconSize: isCompact ? 12 : 22,
                                 padding: EdgeInsets.all(isCompact ? 1 : 12),
                                 onPressed: _controller.decrementOctave,
                               ),
                               Text(
                                 '${_controller.keyboardOctave}',
                                 style: TextStyle(
-                                  fontSize: isCompact ? 12 : 22,
+                                  fontSize: isCompact ? 12 : 20,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.add),
                                 tooltip: 'Increase Octave',
-                                iconSize: isCompact ? 12 : 24,
+                                iconSize: isCompact ? 12 : 22,
                                 padding: EdgeInsets.all(isCompact ? 1 : 12),
                                 onPressed: _controller.incrementOctave,
                               ),
@@ -154,14 +154,14 @@ class _PianoPageState extends State<PianoPage> {
                               Text(
                                 '#',
                                 style: TextStyle(
-                                  fontSize: isCompact ? 14 : 21,
+                                  fontSize: isCompact ? 14 : 20,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               Text(
                                 'b',
                                 style: TextStyle(
-                                  fontSize: isCompact ? 14 : 21,
+                                  fontSize: isCompact ? 14 : 20,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

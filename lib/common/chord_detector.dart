@@ -115,17 +115,6 @@ class ChordDetector {
     return out;
   }
 
-  // static bool _isStructurallyChord(Set<int> intervals) {
-  //   final hasThird =
-  //       intervals.contains(3) || intervals.contains(4);
-
-  //   final hasSus =
-  //       intervals.contains(2) || intervals.contains(5);
-
-  //   // Must define harmony somehow
-  //   return hasThird || hasSus;
-  // }
-
   static int _scoreChord(Set<int> template, Set<int> played) {
     final extra = played.difference(template).length;
     final missing = template.difference(played).length;
@@ -133,20 +122,16 @@ class ChordDetector {
   }
 
   static bool _acceptableRoot(Set<int> template, Set<int> played) {
-    final isMajorTriad =
-        template.contains(4) && template.contains(7);
-    final isMinorTriad =
-        template.contains(3) && template.contains(7);
+    final isMajorTriad = template.contains(4) && template.contains(7);
+    final isMinorTriad = template.contains(3) && template.contains(7);
 
     // Only require the third (quality-defining interval), not the fifth
     if (isMajorTriad && !played.contains(4)) {
       return false;
     }
-
     if (isMinorTriad && !played.contains(3)) {
       return false;
     }
-
     return true;
   }
 

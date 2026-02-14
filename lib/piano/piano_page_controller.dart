@@ -1,12 +1,10 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:piano/piano.dart';
+import 'package:piano_app/common/audio_service.dart';
+import 'package:piano_app/common/chord_detector.dart';
 import 'package:piano_app/common/constants.dart';
-import 'package:flutter_midi_command/flutter_midi_command.dart';
-import 'package:flutter_midi_pro/flutter_midi_pro.dart';
-import '../common/chord_detector.dart';
+import 'package:piano_app/common/midi_service.dart';
 
 class PianoPageController extends ChangeNotifier {
   PianoPageController();
@@ -19,7 +17,8 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
-  List<String> _connectedDeviceNames = [];
+  final MidiService _midiService = MidiService();
+  final AudioService _audioService = AudioService();
 
   // Variables
   int _keyboardOctave = 4;
@@ -55,8 +54,7 @@ class PianoPageController extends ChangeNotifier {
   int get selectedScaleRootPc => _selectedScale.rootPc ?? 0;
   String get selectedScaleType => _selectedScale.type;
   // Connected devices
-  List<String> get connectedDeviceNames =>
-      List.unmodifiable(_connectedDeviceNames);
+  List<String> get connectedDeviceNames => _midiService.connectedDeviceNames;
 
   void _updateChord() {
     final detected =
@@ -74,35 +72,14 @@ class PianoPageController extends ChangeNotifier {
   void setMuted(bool value) {
     if (_isMuted == value) return;
     _isMuted = value;
-    if (_isMuted && sfId != null) {
+    if (_isMuted) {
       for (final note in _pressedNotes) {
-        midi.stopNote(
-          channel: 0,
-          key: note.pitch,
-          sfId: sfId!,
-        );
+        _audioService.stopNote(key: note.pitch);
       }
     }
     notifyListeners();
   }
-
   void toggleMuted() => setMuted(!_isMuted);
-
-  Future<void> setSoundFont(SoundFontOption soundFont) async {
-    if (_soundFont.assetPath == soundFont.assetPath) return;
-    _soundFont = soundFont;
-    if (sfId != null) {
-      for (final note in _pressedNotes) {
-        midi.stopNote(
-          channel: 0,
-          key: note.pitch,
-          sfId: sfId!,
-        );
-      }
-    }
-    await _loadSoundFont(soundFont: soundFont);
-    notifyListeners();
-  }
 
   void incrementOctave() {
     final newOctave = (_keyboardOctave + 1).clamp(0, 8).toInt();
@@ -154,12 +131,7 @@ class PianoPageController extends ChangeNotifier {
             _activeKeyNotes[event.logicalKey] = note;
 
             if (!_isMuted) {
-              midi.playNote(
-                channel: 0,
-                key: note.pitch,
-                velocity: 100,
-                sfId: sfId!,
-              );
+              _audioService.playNote(key: note.pitch);
             }
             updated = true;
           }
@@ -170,11 +142,7 @@ class PianoPageController extends ChangeNotifier {
       if (note != null) {
         _pressedNotes.remove(note);
         if (!_isMuted) {
-          midi.stopNote(
-            channel: 0,
-            key: note.pitch,
-            sfId: sfId!,
-          );
+          _audioService.stopNote(key: note.pitch);
         }
         updated = true;
       }
@@ -289,7 +257,6 @@ class PianoPageController extends ChangeNotifier {
         selectedNotes.add(note);
       }
     }
-
     return selectedNotes;
   }
 
@@ -355,20 +322,12 @@ class PianoPageController extends ChangeNotifier {
     return normalized;
   }
 
-  final MidiPro midi = MidiPro();
-  int? sfId;
-
   void pressNote(NotePosition position) {
     if (!_pressedNotes.contains(position)) {
       _pressedNotes.add(position);
 
       if (!_isMuted) {
-        midi.playNote(
-          channel: 0,
-          key: position.pitch,
-          velocity: 100,
-          sfId: sfId!,
-        );
+        _audioService.playNote(key: position.pitch);
       }
 
       _updateChord();
@@ -381,123 +340,43 @@ class PianoPageController extends ChangeNotifier {
       _pressedNotes.remove(position);
 
       if (!_isMuted) {
-        midi.stopNote(
-          channel: 0,
-          key: position.pitch,
-          sfId: sfId!,
-        );
+        _audioService.stopNote(key: position.pitch);
       }
-
       _updateChord();
       notifyListeners();
     }
   }
-
-  //*** MIDI sound ***
+  //*** Audio handling***
+  Future<void> setSoundFont(SoundFontOption soundFont) async {
+    if (_soundFont.assetPath == soundFont.assetPath) return;
+    _soundFont = soundFont;
+    for (final note in _pressedNotes) {
+      _audioService.stopNote(key: note.pitch);
+    }
+    await _audioService.loadSoundFont(assetPath: soundFont.assetPath);
+    notifyListeners();
+  }
   Future<void> loadSoundFont() async {
-    await _loadSoundFont(soundFont: _soundFont);
+    await _audioService.loadSoundFont(assetPath: _soundFont.assetPath);
   }
 
-  Future<void> _loadSoundFont({required SoundFontOption soundFont}) async {
-    sfId = await midi.loadSoundfontAsset(
-      assetPath: soundFont.assetPath,
-      bank: 0,
-      program: 0,
-    );
-
-    await midi.selectInstrument(
-      sfId: sfId!,
-      channel: 0,
-      bank: 0,
-      program: 0,
-    );
-  }
-
-  // *** MIDI hardware ***
-  StreamSubscription<MidiPacket>? _midiDataSubscription;
-  StreamSubscription<String>? _midiSetupSubscription;
-  final MidiCommand midiCommand = MidiCommand();
-
+  //*** Midi handling ***
   Future<void> startHardwareMidiListening() async {
-    _midiDataSubscription ??=
-        midiCommand.onMidiDataReceived?.listen(_handleMidiPacket);
-
-    _midiSetupSubscription ??=
-        midiCommand.onMidiSetupChanged?.listen((_) => _connectToFirstDevice());
-
-    await _connectToFirstDevice();
-  }
-
-  Future<void> _connectToFirstDevice() async {
-    try {
-      final devices = await midiCommand.devices;
-      if (devices == null) {
-        _setConnectedDeviceNames(null);
-        debugPrint('No MIDI devices detected');
-        return;
-      }
-
-      MidiDevice? target;
-      for (final device in devices) {
-        if (device.connected) {
-          target = device;
-          break;
+    await _midiService.startListening(
+      onNoteOn: (midiKey) {
+        final notePosition = _noteFromMidiKey(midiKey);
+        if (notePosition != null) {
+          pressNote(notePosition);
         }
-        target ??= device;
-      }
-
-      if (target == null) {
-        _setConnectedDeviceNames(devices);
-        return;
-      }
-
-      if (!target.connected) {
-        await midiCommand.connectToDevice(target);
-        debugPrint('Connected to MIDI device: ${target.name}');
-      }
-      _setConnectedDeviceNames(devices, ensureName: target.name);
-    } catch (e) {
-      debugPrint('Failed to connect to MIDI device: $e');
-    }
-  }
-
-  void _setConnectedDeviceNames(
-    List<MidiDevice>? devices, {
-    String? ensureName,
-  }) {
-    final names = <String>[];
-    if (devices != null) {
-      for (final device in devices) {
-        if (device.connected) {
-          names.add(device.name);
+      },
+      onNoteOff: (midiKey) {
+        final notePosition = _noteFromMidiKey(midiKey);
+        if (notePosition != null) {
+          releaseNote(notePosition);
         }
-      }
-    }
-    if (ensureName != null && !names.contains(ensureName)) {
-      names.add(ensureName);
-    }
-    if (!listEquals(_connectedDeviceNames, names)) {
-      _connectedDeviceNames = names;
-      notifyListeners();
-    }
-  }
-
-  void _handleMidiPacket(MidiPacket packet) {
-    final data = packet.data;
-    if (data.length < 3) return;
-    debugPrint('MIDI data: ${data.join(', ')}');
-    final status = data[0] & 0xF0;
-    final key = data[1];
-    final velocity = data[2];
-    final notePosition = _noteFromMidiKey(key);
-
-    if (notePosition == null) return;
-
-    if (status == 0x90 && velocity > 0) {
-      pressNote(notePosition);
-    } else if (status == 0x80 || (status == 0x90 && velocity == 0)) {
-      releaseNote(notePosition);
-    }
+      },
+      onDeviceNamesChanged: notifyListeners,
+    );
   }
 
   NotePosition? _noteFromMidiKey(int key) {
@@ -509,8 +388,7 @@ class PianoPageController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _midiDataSubscription?.cancel();
-    _midiSetupSubscription?.cancel();
+    _midiService.dispose();
     focusNode.dispose();
     super.dispose();
   }

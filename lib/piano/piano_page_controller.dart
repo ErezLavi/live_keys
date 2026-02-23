@@ -38,8 +38,7 @@ class PianoPageController extends ChangeNotifier {
   bool get useFlats => _useFlats;
   bool get isMuted => _isMuted;
   SoundFontOption get selectedSoundFont => _soundFont;
-  List<SoundFontOption> get availableSoundFonts =>
-      List.unmodifiable(Constants.soundFonts);
+  List<SoundFontOption> get availableSoundFonts => List.unmodifiable(Constants.soundFonts);
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
     combined.addAll(_selectedChord.notes);
@@ -57,8 +56,7 @@ class PianoPageController extends ChangeNotifier {
   List<String> get connectedDeviceNames => _midiService.connectedDeviceNames;
 
   void _updateChord() {
-    final detected =
-        ChordDetector.detect(_pressedNotes, useFlats: _useFlats);
+    final detected = ChordDetector.detect(_pressedNotes, useFlats: _useFlats);
     currentChord = detected?.name ?? "";
   }
 
@@ -68,18 +66,6 @@ class PianoPageController extends ChangeNotifier {
     _updateChord();
     notifyListeners();
   }
-
-  void setMuted(bool value) {
-    if (_isMuted == value) return;
-    _isMuted = value;
-    if (_isMuted) {
-      for (final note in _pressedNotes) {
-        _audioService.stopNote(key: note.pitch);
-      }
-    }
-    notifyListeners();
-  }
-  void toggleMuted() => setMuted(!_isMuted);
 
   void incrementOctave() {
     final newOctave = (_keyboardOctave + 1).clamp(0, 8).toInt();
@@ -346,6 +332,7 @@ class PianoPageController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   //*** Audio handling***
   Future<void> setSoundFont(SoundFontOption soundFont) async {
     if (_soundFont.assetPath == soundFont.assetPath) return;
@@ -359,6 +346,17 @@ class PianoPageController extends ChangeNotifier {
   Future<void> loadSoundFont() async {
     await _audioService.loadSoundFont(assetPath: _soundFont.assetPath);
   }
+  void setMuted(bool value) {
+    if (_isMuted == value) return;
+    _isMuted = value;
+    if (_isMuted) {
+      for (final note in _pressedNotes) {
+        _audioService.stopNote(key: note.pitch);
+      }
+    }
+    notifyListeners();
+  }
+  void toggleMuted() => setMuted(!_isMuted);
 
   //*** Midi handling ***
   Future<void> startHardwareMidiListening() async {

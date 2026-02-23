@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:piano_app/common/app_sizes.dart';
 import 'package:piano_app/common/constants.dart';
 
-typedef OnChordSelected = void Function(
-  int rootPc,
-  String chordType,
-  int inversion,
-);
+typedef OnChordSelected =
+    void Function(int rootPc, String chordType, int inversion);
 typedef OnChordCleared = void Function();
 
 class ChordsGrid extends StatefulWidget {
@@ -59,9 +57,10 @@ class _ChordsGridState extends State<ChordsGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final rootNames = List<int>.generate(12, (index) => index)
-        .map((pc) => Constants.noteName(pc, useFlats: widget.useFlats))
-        .toList();
+    final rootNames = List<int>.generate(
+      12,
+      (index) => index,
+    ).map((pc) => Constants.noteName(pc, useFlats: widget.useFlats)).toList();
     final chordTypes = Constants.chordDB.keys
         .where((type) => (Constants.chordRank[type] ?? 999) <= 27)
         .toList();
@@ -69,16 +68,16 @@ class _ChordsGridState extends State<ChordsGrid> {
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(AppSizes.radiusL),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSizes.space12),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(width: 8),
+              AppSizes.space8.sbWidth,
               Row(
                 children: [
                   Spacer(),
@@ -89,11 +88,8 @@ class _ChordsGridState extends State<ChordsGrid> {
                   ),
                 ],
               ),
-              Text(
-                'Root',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
+              Text('Root', style: Theme.of(context).textTheme.titleSmall),
+              AppSizes.space8.sbHeight,
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
@@ -107,7 +103,7 @@ class _ChordsGridState extends State<ChordsGrid> {
                   );
                 }),
               ),
-              const SizedBox(height: 12),
+              AppSizes.space12.sbHeight,
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -117,7 +113,7 @@ class _ChordsGridState extends State<ChordsGrid> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              AppSizes.space8.sbHeight,
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
@@ -131,12 +127,9 @@ class _ChordsGridState extends State<ChordsGrid> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 12),
-              Text(
-                'Inversion',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
+              AppSizes.space12.sbHeight,
+              Text('Inversion', style: Theme.of(context).textTheme.titleSmall),
+              AppSizes.space8.sbHeight,
               Wrap(
                 spacing: 6,
                 runSpacing: 6,

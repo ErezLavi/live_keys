@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:piano_app/common/app_sizes.dart';
 import 'package:piano_app/common/constants.dart';
 
 typedef OnScaleSelected = void Function(int rootPc, String scaleType);
@@ -47,23 +48,24 @@ class _ScalesGridState extends State<ScalesGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final rootNames = List<int>.generate(12, (index) => index)
-        .map((pc) => Constants.noteName(pc, useFlats: widget.useFlats))
-        .toList();
+    final rootNames = List<int>.generate(
+      12,
+      (index) => index,
+    ).map((pc) => Constants.noteName(pc, useFlats: widget.useFlats)).toList();
     final scaleTypes = Constants.scaleDB.keys.toList();
 
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(AppSizes.radiusL),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSizes.space12),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(width: 8),
+              AppSizes.space8.sbWidth,
               Row(
                 children: [
                   Spacer(),
@@ -74,11 +76,8 @@ class _ScalesGridState extends State<ScalesGrid> {
                   ),
                 ],
               ),
-              Text(
-                'Root',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
+              Text('Root', style: Theme.of(context).textTheme.titleSmall),
+              AppSizes.space8.sbHeight,
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
@@ -92,17 +91,14 @@ class _ScalesGridState extends State<ScalesGrid> {
                   );
                 }),
               ),
-              const SizedBox(height: 12),
+              AppSizes.space12.sbHeight,
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Scale',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
+                  Text('Scale', style: Theme.of(context).textTheme.titleSmall),
                 ],
               ),
-              const SizedBox(height: 8),
+              AppSizes.space8.sbHeight,
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
@@ -148,9 +144,11 @@ class _ScalesGridState extends State<ScalesGrid> {
   String _labelForScaleType(String type) {
     return type
         .split('_')
-        .map((part) => part.isEmpty
-            ? part
-            : '${part[0].toUpperCase()}${part.substring(1)}')
+        .map(
+          (part) => part.isEmpty
+              ? part
+              : '${part[0].toUpperCase()}${part.substring(1)}',
+        )
         .join(' ');
   }
 }

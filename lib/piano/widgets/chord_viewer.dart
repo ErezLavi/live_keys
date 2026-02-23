@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:piano_app/common/app_sizes.dart';
 
 class ChordViewer extends StatelessWidget {
   const ChordViewer({
@@ -26,8 +27,8 @@ class ChordViewer extends StatelessWidget {
           constraints.maxWidth,
           constraints.maxHeight * 1.5,
         );
-        final scaledRootSize = (sizeBasis * 0.2).clamp(24.0, 120.0);
-        final scaledSuffixSize = (sizeBasis * 0.2).clamp(16.0, 110.0);
+        final scaledRootSize = AppSizes.chordRootFontSize(sizeBasis);
+        final scaledSuffixSize = AppSizes.chordSuffixFontSize(sizeBasis);
 
         return Align(
           alignment: Alignment.center,

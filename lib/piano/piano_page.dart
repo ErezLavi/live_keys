@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:piano_app/common/app_sizes.dart';
 import 'package:piano_app/custom_piano/custom_interactive_piano.dart';
 import 'package:piano_app/piano/piano_page_controller.dart';
 import 'package:piano_app/piano/widgets/grand_stuff_viewer_widget.dart';
 import 'package:piano_app/piano/widgets/chord_viewer.dart';
+import 'package:piano_app/piano/widgets/octave_buttons_widget.dart';
 import 'package:piano_app/menu/top_bar.dart';
 
 class PianoPage extends StatefulWidget {
@@ -13,12 +16,13 @@ class PianoPage extends StatefulWidget {
   @override
   State<PianoPage> createState() => _PianoPageState();
 }
-//TODO: refactoring - split controller into smaller controllers and this page to smaller widgets
-//TODO: chord detection fixes
+//TODO: chord detection algorithm improvements
 //TODO: games - play given chord/scale by its name/clef/sound.(3+)
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
+  bool get _showOctaveControls =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
 
   void _onControllerUpdated() {
     setState(() {});
@@ -43,11 +47,9 @@ class _PianoPageState extends State<PianoPage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final keyWidth = (screenWidth / 20).clamp(24.0, 60.0);
-    final horizontalPadding = (screenSize.width * 0.04).clamp(4.0, 32.0);
-    final verticalPadding = (screenSize.height * 0.02).clamp(2.0, 16.0);
-
+    final keyWidth = AppSizes.keyWidth(screenSize.width);
+    final horizontalPadding = AppSizes.overlayHorizontalPadding(screenSize.width,);
+    final verticalPadding = AppSizes.overlayVerticalPadding(screenSize.height);
     return Scaffold(
       body: Stack(
         children: [
@@ -57,7 +59,10 @@ class _PianoPageState extends State<PianoPage> {
               Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                  padding: EdgeInsets.symmetric(
+                    vertical: AppSizes.space16,
+                    horizontal: AppSizes.space12,
+                  ),
                   child: Row(
                     children: [
                       GrandStaffViewerWidget(
@@ -105,48 +110,35 @@ class _PianoPageState extends State<PianoPage> {
                 ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final isCompact = constraints.maxWidth < 840 || constraints.maxHeight < 500;
+                    final isCompact = AppSizes.isCompactLayout(constraints);
+                    final toggleTextSize = isCompact ? AppSizes.space14 : AppSizes.space20;
+                    final menuGap = isCompact ? AppSizes.space12 : AppSizes.space36;
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Material(
-                          elevation: 6,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove),
-                                tooltip: 'Decrease Octave',
-                                iconSize: isCompact ? 12 : 22,
-                                padding: EdgeInsets.all(isCompact ? 1 : 12),
-                                onPressed: _controller.decrementOctave,
-                              ),
-                              Text(
-                                '${_controller.keyboardOctave}',
-                                style: TextStyle(
-                                  fontSize: isCompact ? 12 : 20,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.add),
-                                tooltip: 'Increase Octave',
-                                iconSize: isCompact ? 12 : 22,
-                                padding: EdgeInsets.all(isCompact ? 1 : 12),
-                                onPressed: _controller.incrementOctave,
-                              ),
-                            ],
+                        if (_showOctaveControls) ...[
+                          OctaveButtonsWidget(
+                            isCompact: isCompact,
+                            keyboardOctave: _controller.keyboardOctave,
+                            onIncrement: _controller.incrementOctave,
+                            onDecrement: _controller.decrementOctave,
                           ),
-                        ),
-                        isCompact ? const SizedBox(width: 12) : const SizedBox(width: 36),
+                          SizedBox(width: menuGap),
+                        ],
                         Material(
                           elevation: 6,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppSizes.radiusM),
                           child: ToggleButtons(
-                            borderRadius: BorderRadius.circular(12),
+                            constraints: BoxConstraints(
+                              minWidth: isCompact ? AppSizes.space36 : 48,
+                              minHeight: isCompact ? AppSizes.space36 : 48,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radiusM,
+                            ),
                             isSelected: [
                               !_controller.useFlats,
-                              _controller.useFlats
+                              _controller.useFlats,
                             ],
                             onPressed: (index) =>
                                 _controller.setUseFlats(index == 1),
@@ -154,23 +146,21 @@ class _PianoPageState extends State<PianoPage> {
                               Text(
                                 '#',
                                 style: TextStyle(
-                                  fontSize: isCompact ? 14 : 20,
+                                  fontSize: toggleTextSize,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               Text(
                                 'b',
                                 style: TextStyle(
-                                  fontSize: isCompact ? 14 : 20,
+                                  fontSize: toggleTextSize,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        isCompact
-                            ? const SizedBox(width: 12)
-                            : const SizedBox(width: 36),
+                        SizedBox(width: menuGap),
                         TopMenuBar(
                           controller: _controller,
                           isCompact: isCompact,

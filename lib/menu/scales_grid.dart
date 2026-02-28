@@ -58,7 +58,7 @@ class _ScalesGridState extends State<ScalesGrid> {
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(AppSizes.radiusL),
       child: Padding(
-        padding: const EdgeInsets.all(AppSizes.space12),
+        padding: const EdgeInsets.symmetric(vertical: AppSizes.space8, horizontal: AppSizes.space12),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Column(

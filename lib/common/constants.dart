@@ -20,7 +20,7 @@ class Constants {
 
   // colors
   static const Color playedNoteColor = Color(0xFF7F0881);
-  static const Color highlightedNoteColor = Color(0xFFffE97F4A);
+  static const Color highlightedNoteColor = Color(0xFFE97F4A);
 
   static final Map<LogicalKeyboardKey, int> keyboardKeyOffsets = {
     LogicalKeyboardKey.keyZ: 0,

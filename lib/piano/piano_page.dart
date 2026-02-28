@@ -22,7 +22,7 @@ class PianoPage extends StatefulWidget {
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;
   bool get _showOctaveControls =>
-      !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+    defaultTargetPlatform == TargetPlatform.macOS || _controller.connectedDeviceNames.isNotEmpty;
 
   void _onControllerUpdated() {
     setState(() {});

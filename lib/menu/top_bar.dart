@@ -33,19 +33,31 @@ class TopMenuBar extends StatelessWidget {
           runSpacing: isCompact ? 1 : AppSizes.space4,
           children: [
             MenuAnchor(
-              builder: (context, controller, _) {
-                return IconButton(
-                  icon: const Icon(Icons.music_note),
-                  tooltip: 'Chords',
-                  iconSize: iconSize,
-                  padding: iconPadding,
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
+              alignmentOffset: const Offset(0, 8),
+              builder: (context, menuController, _) {
+                void toggleMenu() {
+                  if (menuController.isOpen) {
+                    menuController.close();
+                  } else {
+                    menuController.open();
+                  }
+                }
+                if (isCompact) {
+                  return IconButton(
+                    icon: const Icon(Icons.piano),
+                    tooltip: 'Chords',
+                    iconSize: iconSize,
+                    padding: iconPadding,
+                    onPressed: toggleMenu,
+                  );
+                }
+                return TextButton.icon(
+                  onPressed: toggleMenu,
+                  icon: Icon(Icons.piano, size: iconSize),
+                  label: const Text('Chords'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.onSurface,
+                  ),
                 );
               },
               menuChildren: [
@@ -60,19 +72,31 @@ class TopMenuBar extends StatelessWidget {
               ],
             ),
             MenuAnchor(
+              alignmentOffset: const Offset(0, 8),
               builder: (context, controller, _) {
-                return IconButton(
-                  icon: const Icon(Icons.piano),
-                  tooltip: 'Scales',
-                  iconSize: iconSize,
-                  padding: iconPadding,
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
+                void toggleMenu() {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                }
+                if (isCompact) {
+                  return IconButton(
+                    onPressed: toggleMenu,
+                    icon: const Icon(Icons.music_note),
+                    tooltip: 'Scales',
+                    iconSize: iconSize,
+                    padding: iconPadding,
+                  );
+                }
+                return TextButton.icon(
+                  onPressed: toggleMenu,
+                  icon: Icon(Icons.music_note, size: iconSize),
+                  label: const Text('Scales'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: IconTheme.of(context).color,
+                  ),
                 );
               },
               menuChildren: [

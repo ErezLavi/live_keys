@@ -112,7 +112,6 @@ class _PianoPageState extends State<PianoPage> {
                   builder: (context, constraints) {
                     final isCompact = AppSizes.isCompactLayout(constraints);
                     final toggleTextSize = isCompact ? AppSizes.space16 : AppSizes.space20;
-                    final menuGap = isCompact ? AppSizes.space12 : AppSizes.space36;
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -123,38 +122,40 @@ class _PianoPageState extends State<PianoPage> {
                             onIncrement: _controller.incrementOctave,
                             onDecrement: _controller.decrementOctave,
                           ),
-                          SizedBox(width: menuGap),
+                          isCompact ? AppSizes.space12.sbWidth : AppSizes.space36.sbWidth
                         ],
-                        Material(
-                          elevation: 6,
-                          borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                          child: ToggleButtons(
+                        if (!isCompact) ... [
+                          Material(
+                            elevation: 6,
                             borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                            isSelected: [
-                              !_controller.useFlats,
-                              _controller.useFlats,
-                            ],
-                            onPressed: (index) =>
-                                _controller.setUseFlats(index == 1),
-                            children: [
-                              Text(
-                                '#',
-                                style: TextStyle(
-                                  fontSize: toggleTextSize,
-                                  fontWeight: FontWeight.w700,
+                            child: ToggleButtons(
+                              borderRadius: BorderRadius.circular(AppSizes.radiusM),
+                              isSelected: [
+                                !_controller.useFlats,
+                                _controller.useFlats,
+                              ],
+                              onPressed: (index) =>
+                                  _controller.setUseFlats(index == 1),
+                              children: [
+                                Text(
+                                  '#',
+                                  style: TextStyle(
+                                    fontSize: toggleTextSize,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'b',
-                                style: TextStyle(
-                                  fontSize: toggleTextSize,
-                                  fontWeight: FontWeight.w700,
+                                Text(
+                                  'b',
+                                  style: TextStyle(
+                                    fontSize: toggleTextSize,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(width: menuGap),
+                        ],  
+                        isCompact ? AppSizes.space12.sbWidth : AppSizes.space36.sbWidth,
                         TopMenuBar(
                           controller: _controller,
                           isCompact: isCompact,

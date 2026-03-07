@@ -24,7 +24,7 @@ class ChordViewer extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final sizeBasis = math.min(
-          constraints.maxWidth,
+          constraints.maxWidth * 0.75,
           constraints.maxHeight * 1.5,
         );
         final scaledRootSize = AppSizes.chordRootFontSize(sizeBasis);

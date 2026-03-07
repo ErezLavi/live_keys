@@ -111,7 +111,7 @@ class _PianoPageState extends State<PianoPage> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final isCompact = AppSizes.isCompactLayout(constraints);
-                    final toggleTextSize = isCompact ? AppSizes.space14 : AppSizes.space20;
+                    final toggleTextSize = isCompact ? AppSizes.space16 : AppSizes.space20;
                     final menuGap = isCompact ? AppSizes.space12 : AppSizes.space36;
                     return Row(
                       mainAxisSize: MainAxisSize.min,
@@ -129,13 +129,7 @@ class _PianoPageState extends State<PianoPage> {
                           elevation: 6,
                           borderRadius: BorderRadius.circular(AppSizes.radiusM),
                           child: ToggleButtons(
-                            constraints: BoxConstraints(
-                              minWidth: isCompact ? AppSizes.space36 : 48,
-                              minHeight: isCompact ? AppSizes.space36 : 48,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              AppSizes.radiusM,
-                            ),
+                            borderRadius: BorderRadius.circular(AppSizes.radiusM),
                             isSelected: [
                               !_controller.useFlats,
                               _controller.useFlats,

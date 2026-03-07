@@ -176,10 +176,7 @@ class TopMenuBar extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              soundFont.assetPath ==
-                                      controller.selectedSoundFont.assetPath
-                                  ? Icons.check
-                                  : null,
+                              soundFont.assetPath == controller.selectedSoundFont.assetPath ? Icons.check : null,
                               size: 18,
                             ),
                             AppSizes.space8.sbWidth,

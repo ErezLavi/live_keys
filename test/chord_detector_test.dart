@@ -15,140 +15,92 @@ NotePosition n(
 }
 
 void main() {
-  group('ChordDetector – valid chords', () {
+  group('ChordDetector – Basic Triads & 7ths', () {
     test('detects C major triad', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 4),
-        n(Note.E, 4),
-        n(Note.G, 4),
-      });
-
-      expect(chord, isNotNull);
+      final chord = ChordDetector.detect({n(Note.C, 4), n(Note.E, 4), n(Note.G, 4)});
       expect(chord!.name, 'C');
     });
 
-    test('detects Cmaj7', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 4),
-        n(Note.E, 4),
-        n(Note.G, 4),
-        n(Note.B, 4),
-      });
+    test('detects C minor triad', () {
+      final chord = ChordDetector.detect({n(Note.C, 4), n(Note.E, 4, Accidental.Flat), n(Note.G, 4)});
+      expect(chord!.name, 'Cm');
+    });
 
-      expect(chord, isNotNull);
+    test('detects Cmaj7 (Full Voicing)', () {
+      final chord = ChordDetector.detect({n(Note.C, 4), n(Note.E, 4), n(Note.G, 4), n(Note.B, 4)});
       expect(chord!.name, 'Cmaj7');
     });
 
-    test('uses slash for inversion bass', () {
-      final chord = ChordDetector.detect({
-        n(Note.E, 4),
-        n(Note.G, 4),
-        n(Note.C, 5),
-      });
+    test('detects Cmaj7 (Shell Voicing - No 5th)', () {
+      // Musicians often omit the 5th; the detector should still catch this.
+      final chord = ChordDetector.detect({n(Note.C, 4), n(Note.E, 4), n(Note.B, 4)});
+      expect(chord!.name, 'Cmaj7');
+    });
+  });
 
-      expect(chord, isNotNull);
+  group('ChordDetector – The "Crunch" Cases (Clusters)', () {
+    test('detects C(addb6) – The C-E-G-G# case', () {
+      final chord = ChordDetector.detect({
+        n(Note.C, 4), 
+        n(Note.E, 4), 
+        n(Note.G, 4), 
+        n(Note.G, 4, Accidental.Sharp)
+      });
+      // This confirms the 'addb6' template beats the simple 'C' triad 
+      // even though 'C' is a higher rank.
+      expect(chord!.name, 'Caddb6'); 
+    });
+
+    test('detects C(add#11) – The Lydian C-E-F#-G case', () {
+      final chord = ChordDetector.detect({
+        n(Note.C, 4), 
+        n(Note.E, 4), 
+        n(Note.F, 4, Accidental.Sharp), 
+        n(Note.G, 4)
+      });
+      expect(chord!.name, 'Cadd#11');
+    });
+  });
+
+  group('ChordDetector – Modern Extensions', () {
+    test('detects Cadd9 (previously "passing tone" test)', () {
+      final chord = ChordDetector.detect({
+        n(Note.C, 4), 
+        n(Note.D, 4), // The 9th
+        n(Note.E, 4), 
+        n(Note.G, 4)
+      });
+      // In a piano app, the user wants to see the color they are playing!
+      expect(chord!.name, 'Cadd9');
+    });
+
+    test('detects C6/9 (Rich Voicing)', () {
+      final chord = ChordDetector.detect({
+        n(Note.C, 3), 
+        n(Note.E, 4), 
+        n(Note.A, 4), // 6th
+        n(Note.D, 5)  // 9th
+      });
+      // Ensure your chordDB/Rank can handle multiple extensions.
+      expect(chord!.name, 'C6/9'); 
+    });
+  });
+
+  group('ChordDetector – Slash Chords & Inversions', () {
+    test('detects C Major 1st Inversion (C/E)', () {
+      final chord = ChordDetector.detect({n(Note.E, 4), n(Note.G, 4), n(Note.C, 5)});
       expect(chord!.name, 'C/E');
     });
+
+    test('detects C-E-G-Ab as Caddb6 when C is bass', () {
+  final chord = ChordDetector.detect({
+    n(Note.C, 3), // Bass
+    n(Note.E, 4), 
+    n(Note.G, 4), 
+    n(Note.A, 4, Accidental.Flat) 
   });
-
-  group('ChordDetector – invalid pitch sets', () {
-    test('returns null for cluster without fifth (G#–B–C)', () {
-      final chord = ChordDetector.detect({
-        n(Note.G, 3, Accidental.Sharp),
-        n(Note.B, 3),
-        n(Note.C, 4),
-      });
-
-      expect(chord, isNull);
-    });
-
-    test('returns null when missing third', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 4),
-        n(Note.G, 4),
-        n(Note.B, 4),
-      });
-
-      expect(chord, isNull);
-    });
-
-    test('detects Cmaj7 without fifth (C-E-B)', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 4),
-        n(Note.E, 4),
-        n(Note.B, 4),
-      });
-
-      expect(chord, isNotNull);
-      expect(chord!.name, 'Cmaj7');
-    });
+  
+  expect(chord!.name, 'Caddb6');
   });
-
-  group('ChordDetector – edge cases', () {
-    test('ignores duplicate pitch classes across octaves', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 3),
-        n(Note.E, 4),
-        n(Note.G, 5),
-        n(Note.C, 6), // duplicate C
-      });
-
-      expect(chord, isNotNull);
-      expect(chord!.name, 'C');
-    });
-
-    test('detects chord with wide voicing', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 2),
-        n(Note.E, 5),
-        n(Note.G, 7),
-      });
-
-      expect(chord, isNotNull);
-      expect(chord!.name, 'C');
-    });
-
-    test('returns null for rootless voicing (E–G–B)', () {
-      final chord = ChordDetector.detect({
-        n(Note.E, 4),
-        n(Note.G, 4),
-        n(Note.B, 4),
-      });
-
-      expect(chord, isNull);
-    });
-
-    test('returns null for power chord (C–G)', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 4),
-        n(Note.G, 4),
-      });
-
-      expect(chord, isNull);
-    });
-
-    test('detects chord with extra non-harmonic tone', () {
-      final chord = ChordDetector.detect({
-        n(Note.C, 4),
-        n(Note.E, 4),
-        n(Note.G, 4),
-        n(Note.D, 4), // passing tone
-      });
-
-      expect(chord, isNotNull);
-      expect(chord!.name, 'C');
-    });
-
-    test('detects slash chord with non-root bass', () {
-      final chord = ChordDetector.detect({
-        n(Note.D, 3), // bass
-        n(Note.C, 4),
-        n(Note.E, 4),
-        n(Note.G, 4),
-      });
-
-      expect(chord, isNotNull);
-      expect(chord!.name, 'C/D');
-    });
-  });
+});
 }

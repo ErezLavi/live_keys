@@ -133,7 +133,7 @@ class Constants {
   };
 
 static const Map<String, int> chordRank = {
-  // The "Essentials" (Triads & basic 7ths)
+  // 0-9: The "Essentials" (Triads & basic 7ths)
   "": 0,
   "m": 1,
   "7": 2,
@@ -144,24 +144,26 @@ static const Map<String, int> chordRank = {
   "dim": 7,
   "aug": 8,
 
-  // Standard Extensions
+  // 10-19: Standard Extensions & 6th Chords
   "maj9": 10,
   "9": 11,
   "m9": 12,
   "6": 13,
   "m6": 14,
-  "dim7": 15,
-  "m7b5": 16,
+  "6/9": 15,    // Added: Vital for your C6/9 test
+  "m6/9": 16,   // Added: Minor equivalent
+  "dim7": 17,
+  "m7b5": 18,
 
-  // The "Add" Chords (Your specific clusters)
+  // 20-29: The "Add" Chords (Specific color clusters)
   "add9": 20,
   "add2": 21,
   "add4": 22,
-  "addb6": 23,   // Matches your C-E-G-G#
-  "add#11": 24,  // Matches your C-E-F#-G
+  "addb6": 23,   
+  "add#11": 24,  
   "m9(no7)": 25,
 
-  // Advanced/Altered (Complex tensions)
+  // 30-39: Advanced/Altered (Complex tensions)
   "7sus4": 30,
   "7#5": 31,
   "7b5": 32,
@@ -174,7 +176,7 @@ static const Map<String, int> chordRank = {
   "mMaj7#5": 39,
   "maj7sus4": 40,
 
-  // Deep Extensions
+  // 40+: Deep Extensions
   "11": 41,
   "13": 42,
   "m11": 43,

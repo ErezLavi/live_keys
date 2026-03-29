@@ -73,18 +73,21 @@ class ChordDetector {
     if (candidates.isEmpty) return null;
 
     candidates.sort((a, b) {
+      // Accuracy First: Highest score wins
       if (a.score != b.score) {
         return b.score.compareTo(a.score);
       }
 
-      if (a.root == bassPc && b.root != bassPc) return -1;
-      if (b.root == bassPc && a.root != bassPc) return 1;
-
+      // Commonality: Lower rank (more common) wins
       final aRank = Constants.chordRank[a.type] ?? 9999;
       final bRank = Constants.chordRank[b.type] ?? 9999;
       if (aRank != bRank) {
         return aRank.compareTo(bRank);
       }
+
+      // Inversion: If everything else is a tie, prefer Root Position
+      if (a.root == bassPc && b.root != bassPc) return -1;
+      if (b.root == bassPc && a.root != bassPc) return 1;
 
       return a.root.compareTo(b.root);
     });

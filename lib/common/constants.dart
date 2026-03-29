@@ -66,11 +66,15 @@ class Constants {
     "7#9":    {4, 7, 10, 3},
     "7#11":   {4, 7, 10, 6},
     "7b13":   {4, 7, 10, 8},
+    "7#5":    {4, 8, 10},
 
     // --- Additions ---
+    "add2":   {2, 4, 7},
     "add4":   {4, 7, 5},
-    "add9":   {4, 7, 2},    
+    "add9":   {4, 7, 2}, 
+    "m(add9)": {3, 7, 2},
     "6":      {4, 7, 9},
+    "6/9":    {4, 7, 9, 2},
     "m9":     {3, 7, 10, 2},
     "m11":    {3, 7, 10, 2, 5},
     "m13":    {3, 7, 10, 2, 5, 9},
@@ -79,7 +83,8 @@ class Constants {
     "m7b5":   {3, 6, 10},
     "7sus4":  {5, 7, 10},
     "7b5":    {4, 6, 10},
-    "7#5":    {4, 8, 10},
+    "add#11": {4, 6, 7},
+    "addb6":  {4, 7, 8},
     "maj7#5": {4, 8, 11},
     "maj7sus4": {5, 7, 11},
     "maj9":   {4, 7, 11, 2},
@@ -122,45 +127,59 @@ class Constants {
     "7#9": {3},
     "7#11": {6},
     "7b13": {8},
+    "addb6": {8},
+    "add#11": {6},
+    "add2": {2},
   };
 
-  // Lower is simpler / preferred in tie-breaks.
-  static const Map<String, int> chordRank = {
-    "": 0,
-    "m": 1,
-    "7": 2,
-    "maj7": 3,
-    "m7": 4,
-    "maj9": 7,
-    "sus2": 8,
-    "sus4": 9,
-    "dim": 10,
-    "dim7": 11,
-    "aug": 12,
-    "9": 13,
-    "11": 14,
-    "13": 15,
-    "add4": 20,
-    "add9": 21,
-    "6": 22,
-    "m9": 23,
-    "m11": 24,
-    "m13": 25,
-    "m6": 26,
-    "m7b5": 27,
-    "7sus4": 28,
-    "7b5": 29,
-    "7#5": 30,
-    "maj7#5": 31,
-    "m9(no7)": 32,
-    "mMaj7": 33,
-    "mMaj7#5": 34,
-    "7b9": 35,
-    "7#9": 36,
-    "7#11": 37,
-    "7b13": 38,
-    "maj7sus4": 39,
-  };
+static const Map<String, int> chordRank = {
+  // The "Essentials" (Triads & basic 7ths)
+  "": 0,
+  "m": 1,
+  "7": 2,
+  "maj7": 3,
+  "m7": 4,
+  "sus4": 5,
+  "sus2": 6,
+  "dim": 7,
+  "aug": 8,
+
+  // Standard Extensions
+  "maj9": 10,
+  "9": 11,
+  "m9": 12,
+  "6": 13,
+  "m6": 14,
+  "dim7": 15,
+  "m7b5": 16,
+
+  // The "Add" Chords (Your specific clusters)
+  "add9": 20,
+  "add2": 21,
+  "add4": 22,
+  "addb6": 23,   // Matches your C-E-G-G#
+  "add#11": 24,  // Matches your C-E-F#-G
+  "m9(no7)": 25,
+
+  // Advanced/Altered (Complex tensions)
+  "7sus4": 30,
+  "7#5": 31,
+  "7b5": 32,
+  "7b9": 33,
+  "7#9": 34,
+  "7#11": 35,
+  "7b13": 36,
+  "maj7#5": 37,
+  "mMaj7": 38,
+  "mMaj7#5": 39,
+  "maj7sus4": 40,
+
+  // Deep Extensions
+  "11": 41,
+  "13": 42,
+  "m11": 43,
+  "m13": 44,
+};
 
   static const sharpNames = [
     "C", "C#", "D", "D#", "E", "F",

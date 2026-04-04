@@ -220,15 +220,11 @@ class CustomClefPainter extends CustomPainter with EquatableMixin {
     }
 
     final clefHeight = (firstLineY - lastLineY);
-    final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
-    final clefSymbolOffset = isAndroid
-        ? (clef == Clef.Treble ? 0.08 : 0.2)
-        : (clef == Clef.Treble ? 0.45 : 0.08);
+    final isMacOS = !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+    final clefSymbolOffset = isMacOS ? (clef == Clef.Treble ? 0.5 : 0.2) : 0.35;
 
     if (_clefSymbolPainter == null || clefSize != _lastClefSize) {
-      final clefSymbolScale = isAndroid
-          ? (clef == Clef.Treble ? 1.1 : 1.2)
-          : (clef == Clef.Treble ? 2.35 : 1.34);
+      final clefSymbolScale = isMacOS ? (clef == Clef.Treble ? 2.3 : 1.3) : 1.5;
       final targetHeight = clefHeight * clefSymbolScale;
       const baseSize = 100.0;
 

@@ -36,7 +36,7 @@ dependencies:
     git:
       url: https://github.com/ErezLavi/flutter_midi_pro.git
       ref: windows-support
-  flutter_midi_command: ^0.5.3
+  flutter_midi_command: ^0.5.4
   flutter_launcher_icons: ^0.14.2
 
 dev_dependencies:

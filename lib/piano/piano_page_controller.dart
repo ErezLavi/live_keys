@@ -5,7 +5,7 @@ import 'package:piano_app/common/audio_service.dart';
 import 'package:piano_app/common/chord_detector.dart';
 import 'package:piano_app/common/constants.dart';
 import 'package:piano_app/common/midi_service.dart';
-import 'package:piano_app/common/piano_theory.dart';
+import 'package:piano_app/common/piano_utils.dart';
 import 'package:piano_app/domain/selected_chord.dart';
 import 'package:piano_app/domain/selected_scale.dart';
 
@@ -22,7 +22,7 @@ class PianoPageController extends ChangeNotifier {
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
   final MidiService _midiService = MidiService();
   final AudioService _audioService = AudioService();
-  final PianoTheory _pianoTheory = const PianoTheory();
+  final PianoUtils _pianoTheory = const PianoUtils();
 
   // Variables
   int _keyboardOctave = 4;

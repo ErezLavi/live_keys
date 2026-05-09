@@ -1,8 +1,8 @@
 import 'package:piano/piano.dart';
 import 'package:piano_app/common/constants.dart';
 
-class PianoTheory {
-  const PianoTheory();
+class PianoUtils {
+  const PianoUtils();
 
   NotePosition noteFromOffset(int semitone) {
     final octave = semitone ~/ 12;

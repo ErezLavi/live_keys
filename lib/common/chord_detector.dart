@@ -2,19 +2,19 @@ import 'package:piano_app/common/constants.dart';
 import 'package:piano/piano.dart';
 
 class DetectedChord {
+  DetectedChord({required this.name, required this.root, required this.bass});
+
   final String name;
   final int root;
   final int bass;
-
-  DetectedChord({required this.name, required this.root, required this.bass});
 }
 
 class Candidate {
+  Candidate(this.root, this.type, this.score);
+
   final int root;
   final String type;
   final int score;
-
-  Candidate(this.root, this.type, this.score);
 }
 
 class ChordDetector {

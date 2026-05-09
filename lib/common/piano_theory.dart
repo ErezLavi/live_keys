@@ -1,0 +1,140 @@
+import 'package:piano/piano.dart';
+import 'package:piano_app/common/constants.dart';
+
+class PianoTheory {
+  const PianoTheory();
+
+  NotePosition noteFromOffset(int semitone) {
+    final octave = semitone ~/ 12;
+    switch (semitone % 12) {
+      case 0:
+        return NotePosition(note: Note.C, octave: octave);
+      case 1:
+        return NotePosition(
+          note: Note.C,
+          octave: octave,
+          accidental: Accidental.Sharp,
+        );
+      case 2:
+        return NotePosition(note: Note.D, octave: octave);
+      case 3:
+        return NotePosition(
+          note: Note.D,
+          octave: octave,
+          accidental: Accidental.Sharp,
+        );
+      case 4:
+        return NotePosition(note: Note.E, octave: octave);
+      case 5:
+        return NotePosition(note: Note.F, octave: octave);
+      case 6:
+        return NotePosition(
+          note: Note.F,
+          octave: octave,
+          accidental: Accidental.Sharp,
+        );
+      case 7:
+        return NotePosition(note: Note.G, octave: octave);
+      case 8:
+        return NotePosition(
+          note: Note.G,
+          octave: octave,
+          accidental: Accidental.Sharp,
+        );
+      case 9:
+        return NotePosition(note: Note.A, octave: octave);
+      case 10:
+        return NotePosition(
+          note: Note.A,
+          octave: octave,
+          accidental: Accidental.Sharp,
+        );
+      case 11:
+      default:
+        return NotePosition(note: Note.B, octave: octave);
+    }
+  }
+
+  List<NotePosition> buildChordNotesForOctave({
+    required int rootPc,
+    required String chordType,
+    required int octave,
+    required int inversion,
+    required NoteRange noteRange,
+  }) {
+    final intervals = Constants.chordDB[chordType];
+    if (intervals == null) return [];
+
+    final rootPitch = octave * 12 + rootPc;
+    final orderedIntervals = _normalizeChordIntervals(chordType, intervals);
+    final invertedIntervals =
+        Constants.applyChordInversion(orderedIntervals, inversion);
+    final selectedNotes = <NotePosition>[];
+    final usedPitches = <int>{};
+
+    for (final interval in invertedIntervals) {
+      final pitch = rootPitch + interval;
+      if (!usedPitches.add(pitch)) continue;
+      final note = noteFromOffset(pitch);
+      if (noteRange.contains(note)) {
+        selectedNotes.add(note);
+      }
+    }
+
+    return selectedNotes;
+  }
+
+  List<NotePosition> buildScaleNotesForOctave({
+    required int rootPc,
+    required String scaleType,
+    required int octave,
+    required NoteRange noteRange,
+  }) {
+    final intervals = Constants.scaleDB[scaleType];
+    if (intervals == null) return [];
+
+    final rootPitch = octave * 12 + rootPc;
+    final orderedIntervals = intervals.toList()..sort();
+    final selectedNotes = <NotePosition>[];
+    final usedPitches = <int>{};
+
+    for (final interval in orderedIntervals) {
+      final pitch = rootPitch + interval;
+      if (!usedPitches.add(pitch)) continue;
+      final note = noteFromOffset(pitch);
+      if (noteRange.contains(note)) {
+        selectedNotes.add(note);
+      }
+    }
+
+    return selectedNotes;
+  }
+
+  List<int> _normalizeChordIntervals(String chordType, Set<int> intervals) {
+    final extensionIntervals = <int>{};
+
+    if (chordType.contains('9')) {
+      extensionIntervals.add(2);
+    }
+    if (chordType.contains('11')) {
+      extensionIntervals.addAll([2, 5]);
+    }
+    if (chordType.contains('13')) {
+      extensionIntervals.addAll([2, 5, 9]);
+    }
+    if (chordType.contains('b9')) extensionIntervals.add(1);
+    if (chordType.contains('#9')) extensionIntervals.add(3);
+    if (chordType.contains('#11')) extensionIntervals.add(6);
+    if (chordType.contains('b13')) extensionIntervals.add(8);
+
+    final normalized = <int>{0, ...intervals}.map((interval) {
+      if (interval != 0 && extensionIntervals.contains(interval)) {
+        return interval + 12;
+      }
+      return interval;
+    }).toList()
+      ..sort();
+
+    return normalized;
+  }
+}

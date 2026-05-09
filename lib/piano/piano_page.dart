@@ -17,7 +17,9 @@ class PianoPage extends StatefulWidget {
   State<PianoPage> createState() => _PianoPageState();
 }
 //TODO: chord detection algorithm improvements
-//TODO: games - play given chord/scale by its name/clef/sound.(3+)
+//TODO: improve layout for tablet/mobile view
+//TODO: fix #/b with regular on same note display
+//TODO: refactor the controller
 
 class _PianoPageState extends State<PianoPage> {
   late final PianoPageController _controller;

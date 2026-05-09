@@ -17,8 +17,8 @@ class OctaveButtonsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = isCompact ? AppSizes.space12 : AppSizes.space22;
-    final iconPadding = isCompact ? AppSizes.space2 : AppSizes.space12;
+    final size = isCompact ? AppSizes.space14 : AppSizes.space22;
+    final iconPadding = isCompact ? 0.0 : AppSizes.space12;
 
     return Material(
       elevation: 6,

@@ -16,7 +16,7 @@ class TopMenuBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconSize = isCompact ? 20.0 : 32.0;
+    final iconSize = isCompact ? AppSizes.space20 : AppSizes.space32;
     final iconPadding = EdgeInsets.all(
       isCompact ? AppSizes.space2 : AppSizes.space8,
     );
@@ -64,9 +64,9 @@ class TopMenuBar extends StatelessWidget {
                 ChordsGrid(
                   onChordSelected: controller.onChordSelected,
                   onChordCleared: controller.clearSelectedChord,
-                  initialRootPc: controller.selectedChordRootPc,
-                  initialChordType: controller.selectedChordType,
-                  initialInversion: controller.selectedChordInversion,
+                  initialRootPc: controller.selectedChord.rootPc ?? 0,
+                  initialChordType: controller.selectedChord.type,
+                  initialInversion: controller.selectedChord.inversion,
                   useFlats: controller.useFlats,
                 ),
               ],
@@ -103,8 +103,8 @@ class TopMenuBar extends StatelessWidget {
                 ScalesGrid(
                   onScaleSelected: controller.onScaleSelected,
                   onScaleCleared: controller.clearSelectedScale,
-                  initialRootPc: controller.selectedScaleRootPc,
-                  initialScaleType: controller.selectedScaleType,
+                  initialRootPc: controller.selectedScale.rootPc ?? 0,
+                  initialScaleType: controller.selectedScale.type,
                   useFlats: controller.useFlats,
                 ),
               ],

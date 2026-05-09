@@ -5,6 +5,9 @@ import 'package:piano_app/common/audio_service.dart';
 import 'package:piano_app/common/chord_detector.dart';
 import 'package:piano_app/common/constants.dart';
 import 'package:piano_app/common/midi_service.dart';
+import 'package:piano_app/common/piano_theory.dart';
+import 'package:piano_app/domain/selected_chord.dart';
+import 'package:piano_app/domain/selected_scale.dart';
 
 class PianoPageController extends ChangeNotifier {
   PianoPageController();
@@ -19,6 +22,7 @@ class PianoPageController extends ChangeNotifier {
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
   final MidiService _midiService = MidiService();
   final AudioService _audioService = AudioService();
+  final PianoTheory _pianoTheory = const PianoTheory();
 
   // Variables
   int _keyboardOctave = 4;
@@ -31,13 +35,13 @@ class PianoPageController extends ChangeNotifier {
 
   // Getters
   List<NotePosition> get pressedNotes => _pressedNotes.toList();
-  List<NotePosition> get selectedChordNotes => _selectedChord.notes;
-  List<NotePosition> get selectedScaleNotes => _selectedScale.notes;
   NoteRange get noteRange => fullRange;
   int get keyboardOctave => _keyboardOctave;
   bool get useFlats => _useFlats;
   bool get isMuted => _isMuted;
   SoundFontOption get selectedSoundFont => _soundFont;
+  SelectedChord get selectedChord => _selectedChord;
+  SelectedScale get selectedScale => _selectedScale;
   List<SoundFontOption> get availableSoundFonts => List.unmodifiable(Constants.soundFonts);
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
@@ -45,13 +49,6 @@ class PianoPageController extends ChangeNotifier {
     combined.addAll(_selectedScale.notes);
     return combined.toList();
   }
-  // Selected chord
-  int get selectedChordInversion => _selectedChord.inversion;
-  int get selectedChordRootPc => _selectedChord.rootPc ?? 0;
-  String get selectedChordType => _selectedChord.type;
-  // Selected scale
-  int get selectedScaleRootPc => _selectedScale.rootPc ?? 0;
-  String get selectedScaleType => _selectedScale.type;
   // Connected devices
   List<String> get connectedDeviceNames => _midiService.connectedDeviceNames;
 
@@ -110,7 +107,7 @@ class PianoPageController extends ChangeNotifier {
         final offset = Constants.keyboardKeyOffsets[event.logicalKey];
         if (offset != null && !_activeKeyNotes.containsKey(event.logicalKey)) {
           final semitone = _keyboardOctave * 12 + offset;
-          final note = noteFromOffset(semitone);
+          final note = _pianoTheory.noteFromOffset(semitone);
 
           if (fullRange.contains(note)) {
             _pressedNotes.add(note);
@@ -140,79 +137,16 @@ class PianoPageController extends ChangeNotifier {
     }
   }
 
-  NotePosition noteFromOffset(int semitone) {
-    final octave = semitone ~/ 12;
-    switch (semitone % 12) {
-      case 0:
-        return NotePosition(note: Note.C, octave: octave);
-      case 1:
-        return NotePosition(
-            note: Note.C, octave: octave, accidental: Accidental.Sharp);
-      case 2:
-        return NotePosition(note: Note.D, octave: octave);
-      case 3:
-        return NotePosition(
-            note: Note.D, octave: octave, accidental: Accidental.Sharp);
-      case 4:
-        return NotePosition(note: Note.E, octave: octave);
-      case 5:
-        return NotePosition(note: Note.F, octave: octave);
-      case 6:
-        return NotePosition(
-            note: Note.F, octave: octave, accidental: Accidental.Sharp);
-      case 7:
-        return NotePosition(note: Note.G, octave: octave);
-      case 8:
-        return NotePosition(
-            note: Note.G, octave: octave, accidental: Accidental.Sharp);
-      case 9:
-        return NotePosition(note: Note.A, octave: octave);
-      case 10:
-        return NotePosition(
-            note: Note.A, octave: octave, accidental: Accidental.Sharp);
-      case 11:
-      default:
-        return NotePosition(note: Note.B, octave: octave);
-    }
-  }
-
-  List<NotePosition> buildChordNotesForOctave(
-    int rootPc,
-    String chordType,
-    int octave,
-    int inversion,
-  ) {
-    final intervals = Constants.chordDB[chordType];
-    if (intervals == null) return [];
-
-    final rootPitch = octave * 12 + rootPc;
-    final orderedIntervals = _normalizeChordIntervals(chordType, intervals);
-    final invertedIntervals =
-        Constants.applyChordInversion(orderedIntervals, inversion);
-    final selectedNotes = <NotePosition>[];
-    final usedPitches = <int>{};
-
-    for (final interval in invertedIntervals) {
-      final pitch = rootPitch + interval;
-      if (!usedPitches.add(pitch)) continue;
-      final note = noteFromOffset(pitch);
-      if (fullRange.contains(note)) {
-        selectedNotes.add(note);
-      }
-    }
-
-    return selectedNotes;
-  }
-
   void onChordSelected(int rootPc, String chordType, int inversion) {
     _selectedChord.rootPc = rootPc;
     _selectedChord.type = chordType;
     _selectedChord.inversion = inversion;
-    _selectedChord.notes = buildChordNotesForOctave(
-      rootPc,
-      chordType,
-      _keyboardOctave,
-      _selectedChord.inversion,
+    _selectedChord.notes = _pianoTheory.buildChordNotesForOctave(
+      rootPc: rootPc,
+      chordType: chordType,
+      octave: _keyboardOctave,
+      inversion: _selectedChord.inversion,
+      noteRange: fullRange,
     );
     notifyListeners();
   }
@@ -222,37 +156,14 @@ class PianoPageController extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<NotePosition> buildScaleNotesForOctave(
-    int rootPc,
-    String scaleType,
-    int octave,
-  ) {
-    final intervals = Constants.scaleDB[scaleType];
-    if (intervals == null) return [];
-
-    final rootPitch = octave * 12 + rootPc;
-    final orderedIntervals = intervals.toList()..sort();
-    final selectedNotes = <NotePosition>[];
-    final usedPitches = <int>{};
-
-    for (final interval in orderedIntervals) {
-      final pitch = rootPitch + interval;
-      if (!usedPitches.add(pitch)) continue;
-      final note = noteFromOffset(pitch);
-      if (fullRange.contains(note)) {
-        selectedNotes.add(note);
-      }
-    }
-    return selectedNotes;
-  }
-
   void onScaleSelected(int rootPc, String scaleType) {
     _selectedScale.rootPc = rootPc;
     _selectedScale.type = scaleType;
-    _selectedScale.notes = buildScaleNotesForOctave(
-      rootPc,
-      scaleType,
-      _keyboardOctave,
+    _selectedScale.notes = _pianoTheory.buildScaleNotesForOctave(
+      rootPc: rootPc,
+      scaleType: scaleType,
+      octave: _keyboardOctave,
+      noteRange: fullRange,
     );
     notifyListeners();
   }
@@ -264,48 +175,22 @@ class PianoPageController extends ChangeNotifier {
 
   void _rebuildSelectedHighlights() {
     if (_selectedChord.rootPc != null) {
-      _selectedChord.notes = buildChordNotesForOctave(
-        _selectedChord.rootPc!,
-        _selectedChord.type,
-        _keyboardOctave,
-        _selectedChord.inversion,
+      _selectedChord.notes = _pianoTheory.buildChordNotesForOctave(
+        rootPc: _selectedChord.rootPc!,
+        chordType: _selectedChord.type,
+        octave: _keyboardOctave,
+        inversion: _selectedChord.inversion,
+        noteRange: fullRange,
       );
     }
     if (_selectedScale.rootPc != null) {
-      _selectedScale.notes = buildScaleNotesForOctave(
-        _selectedScale.rootPc!,
-        _selectedScale.type,
-        _keyboardOctave,
+      _selectedScale.notes = _pianoTheory.buildScaleNotesForOctave(
+        rootPc: _selectedScale.rootPc!,
+        scaleType: _selectedScale.type,
+        octave: _keyboardOctave,
+        noteRange: fullRange,
       );
     }
-  }
-
-  List<int> _normalizeChordIntervals(String chordType, Set<int> intervals) {
-    final extensionIntervals = <int>{};
-
-    if (chordType.contains('9')) {
-      extensionIntervals.add(2);
-    }
-    if (chordType.contains('11')) {
-      extensionIntervals.addAll([2, 5]);
-    }
-    if (chordType.contains('13')) {
-      extensionIntervals.addAll([2, 5, 9]);
-    }
-    if (chordType.contains('b9')) extensionIntervals.add(1);
-    if (chordType.contains('#9')) extensionIntervals.add(3);
-    if (chordType.contains('#11')) extensionIntervals.add(6);
-    if (chordType.contains('b13')) extensionIntervals.add(8);
-
-    final normalized = <int>{0, ...intervals}.map((interval) {
-      if (interval != 0 && extensionIntervals.contains(interval)) {
-        return interval + 12;
-      }
-      return interval;
-    }).toList()
-      ..sort();
-
-    return normalized;
   }
 
   void pressNote(NotePosition position) {
@@ -379,7 +264,7 @@ class PianoPageController extends ChangeNotifier {
 
   NotePosition? _noteFromMidiKey(int key) {
     if (key < 0 || key > 127) return null;
-    final note = noteFromOffset(key);
+    final note = _pianoTheory.noteFromOffset(key);
     if (!fullRange.contains(note)) return null;
     return note;
   }
@@ -389,44 +274,5 @@ class PianoPageController extends ChangeNotifier {
     _midiService.dispose();
     focusNode.dispose();
     super.dispose();
-  }
-}
-
-class SelectedChord {
-  int? rootPc;
-  String type;
-  int inversion;
-  List<NotePosition> notes;
-
-  SelectedChord({
-    this.rootPc,
-    this.type = '',
-    this.inversion = 0,
-    List<NotePosition>? notes,
-  }) : notes = notes ?? [];
-
-  void reset() {
-    rootPc = null;
-    type = '';
-    inversion = 0;
-    notes = [];
-  }
-}
-
-class SelectedScale {
-  int? rootPc;
-  String type;
-  List<NotePosition> notes;
-
-  SelectedScale({
-    this.rootPc,
-    this.type = 'major',
-    List<NotePosition>? notes,
-  }) : notes = notes ?? [];
-
-  void reset() {
-    rootPc = null;
-    type = 'major';
-    notes = [];
   }
 }

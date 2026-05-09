@@ -5,9 +5,9 @@ MIDI input support and a playable keyboard. Fully supported in MacOs, Windows an
 
 ## Downloads
 
-[![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/ErezLavi/piano_app/releases/latest)
-[![Windows](https://img.shields.io/badge/Windows-Download-0078D6?logo=windows)](https://github.com/ErezLavi/piano_app/releases/latest)
-[![Android](https://img.shields.io/badge/Android-Download-3DDC84?logo=android&logoColor=white)](https://github.com/ErezLavi/piano_app/releases/latest)
+[![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/ErezLavi/live_keys/releases/latest)
+[![Windows](https://img.shields.io/badge/Windows-Download-0078D6?logo=windows)](https://github.com/ErezLavi/live_keys/releases/latest)
+[![Android](https://img.shields.io/badge/Android-Download-3DDC84?logo=android&logoColor=white)](https://github.com/ErezLavi/live_keys/releases/latest)
 
 
 ## Features
@@ -35,7 +35,7 @@ instrument.
 1. Install Flutter (SDK 3.9+).
 2. Clone the repository:
    ```bash
-   git clone https://github.com/yourname/piano_app.git
+   git clone https://github.com/ErezLavi/live_keys.git
    cd piano_app
    ```
 3. Fetch dependencies:

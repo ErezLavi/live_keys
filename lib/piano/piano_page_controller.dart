@@ -20,6 +20,7 @@ class PianoPageController extends ChangeNotifier {
   final FocusNode focusNode = FocusNode();
   final Set<NotePosition> _pressedNotes = {};
   final Map<LogicalKeyboardKey, NotePosition> _activeKeyNotes = {};
+  final List<SoundFontOption> _availableSoundFonts = List.of(Constants.soundFonts);
   final MidiService _midiService = MidiService();
   final AudioService _audioService = AudioService();
   final PianoUtils _pianoTheory = const PianoUtils();
@@ -42,7 +43,7 @@ class PianoPageController extends ChangeNotifier {
   SoundFontOption get selectedSoundFont => _soundFont;
   SelectedChord get selectedChord => _selectedChord;
   SelectedScale get selectedScale => _selectedScale;
-  List<SoundFontOption> get availableSoundFonts => List.unmodifiable(Constants.soundFonts);
+  List<SoundFontOption> get availableSoundFonts => List.unmodifiable(_availableSoundFonts);
   List<NotePosition> get combinedHighlightedNotes {
     final combined = <NotePosition>{};
     combined.addAll(_selectedChord.notes);
@@ -225,11 +226,40 @@ class PianoPageController extends ChangeNotifier {
     for (final note in _pressedNotes) {
       _audioService.stopNote(key: note.pitch);
     }
-    await _audioService.loadSoundFont(assetPath: soundFont.assetPath);
+    if (soundFont.assetPath.startsWith('assets/')) {
+      await _audioService.loadSoundFont(assetPath: soundFont.assetPath);
+    } else {
+      await _audioService.loadSoundFontFromFile(filePath: soundFont.assetPath);
+    }
     notifyListeners();
   }
+
+  Future<void> importSoundFontFile(String filePath) async {
+    final existing = _availableSoundFonts
+        .where((option) => option.assetPath == filePath)
+        .cast<SoundFontOption?>()
+        .firstWhere((option) => option != null, orElse: () => null);
+    if (existing != null) {
+      await setSoundFont(existing);
+      return;
+    }
+
+    final fileName = filePath.replaceAll('\\', '/').split('/').last;
+    final importedSoundFont = SoundFontOption(
+      id: 'custom_${DateTime.now().microsecondsSinceEpoch}',
+      name: fileName,
+      assetPath: filePath,
+    );
+    _availableSoundFonts.add(importedSoundFont);
+    await setSoundFont(importedSoundFont);
+  }
+
   Future<void> loadSoundFont() async {
-    await _audioService.loadSoundFont(assetPath: _soundFont.assetPath);
+    if (_soundFont.assetPath.startsWith('assets/')) {
+      await _audioService.loadSoundFont(assetPath: _soundFont.assetPath);
+    } else {
+      await _audioService.loadSoundFontFromFile(filePath: _soundFont.assetPath);
+    }
   }
   void setMuted(bool value) {
     if (_isMuted == value) return;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:piano_app/common/app_sizes.dart';
 import 'package:piano_app/menu/chords_grid.dart';
 import 'package:piano_app/menu/scales_grid.dart';
@@ -184,6 +185,27 @@ class TopMenuBar extends StatelessWidget {
                           ],
                         ),
                       ),
+                    const Divider(),
+                    MenuItemButton(
+                      closeOnActivate: false,
+                      onPressed: () async {
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['sf2'],
+                        );
+                        final path = result?.files.single.path;
+                        if (path == null || path.isEmpty) return;
+                        await controller.importSoundFontFile(path);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.upload_file, size: 18),
+                          AppSizes.space8.sbWidth,
+                          const Text('Import SF2...'),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 MenuItemButton(

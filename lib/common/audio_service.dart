@@ -26,6 +26,26 @@ class AudioService {
     );
   }
 
+  Future<void> loadSoundFontFromFile({
+    required String filePath,
+    int bank = 0,
+    int program = 0,
+    int channel = 0,
+  }) async {
+    _sfId = await _midi.loadSoundfontFile(
+      filePath: filePath,
+      bank: bank,
+      program: program,
+    );
+
+    await _midi.selectInstrument(
+      sfId: _sfId!,
+      channel: channel,
+      bank: bank,
+      program: program,
+    );
+  }
+
   void playNote({
     required int key,
     int velocity = 100,

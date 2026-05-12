@@ -1,111 +1,65 @@
 # Chord Detector
 
-This document describes the chord detection logic in `lib/piano/chord_detector.dart`.
+This note describes the current chord-detection logic in [lib/common/chord_detector.dart](/Users/erezlavi/Personal%20projects/piano_app/lib/common/chord_detector.dart).
 
-## Overview
+## What It Does
 
-`ChordDetector.detect` takes a set of pressed `NotePosition` values, converts them to pitch classes, evaluates candidate chords against a chord template database, and returns the best match (including inversion/slash bass notation when appropriate).
+`ChordDetector.detect()` takes the pressed `NotePosition` set and returns a `DetectedChord` with:
 
-### Key Types
+- `name`: display name such as `C`, `Cm`, `Cmaj7`, or `C/E`
+- `root`: root pitch class (`0-11`)
+- `bass`: lowest played pitch class (`0-11`)
 
-- `DetectedChord`: output model containing `name`, `root`, and `bass` (all pitch-class based).
-- `Candidate`: internal scoring tuple for a potential `(root, type)` chord match.
-- `ChordDetector`: static utility with detection and helper functions.
+If fewer than 3 unique pitch classes are played, it returns `null`. (Doesn't support dyads/intervals as chords here)
 
-## Data Dependencies
+## Detection Rules
 
-The detector relies on constants defined in `lib/common/constants.dart`:
+1. Convert pressed notes to unique pitch classes.
+2. Find the bass from the lowest played note.
+3. Try each played pitch class as a possible root.
+4. Compare that root against every chord template in `Constants.chordDB`.
+5. Keep only candidates that pass the filters:
+   - the chord quality interval must exist (`3` for minor, `4` for major)
+   - required color tones must exist for specific chord types in `Constants.chordRequiredIntervals`
+   - at most one template tone may be missing
+   - `sus` chords are rejected if a major or minor third is also present
+6. Score each remaining candidate by mismatch count:
+   - `score = -(extra tones + missing tones)`
+7. Sort candidates by:
+   - highest score
+   - root position preference (`root == bass`)
+   - lower `Constants.chordRank` value
+   - lower root pitch class
 
-- `Constants.chordDB`: map of chord type string to interval template (set of semitone offsets from root).
-- `Constants.chordRank`: tie-breaker ranking for chord types.
-- `Constants.noteName(int pc)`: pitch-class to note-name conversion for display.
+The best candidate becomes the detected chord.
 
-## Detection Flow
+## Naming
 
-1. Convert pressed notes to pitch classes (0-11), de-duplicate, and sort.
-2. Reject if fewer than 3 unique pitch classes.
-3. Determine the true bass pitch class from the lowest actual pitch.
-4. For each pitch class as a candidate root:
-   - Compute played intervals from that root.
-   - For each chord template:
-     - Reject if the template is a triad but the played notes do not include a triad.
-     - Score template vs played intervals.
-     - Save candidate with score.
-5. Sort candidates by:
-   - Higher score first.
-   - Chord rank (lower rank wins).
-   - Prefer root matching the bass pitch class.
-   - Lower root pitch class value.
-6. Build the final chord name, including inversion/slash bass when needed.
+Names use `Constants.noteName()` and the matched chord suffix from `Constants.chordDB`.
 
-## Mermaid Flow Diagram
+- Root position: `C`, `Cm7`, `Cadd9`
+- Inversion or slash bass: `C/E`, `Cmaj7/B`
 
-```mermaid
-flowchart TD
-  A[pressed NotePosition set] --> B[Pitch classes 0-11]
-  B --> C{>= 3 unique?}
-  C -- no --> Z[return null]
-  C -- yes --> D[Find bass PC from lowest pitch]
-  D --> E[For each root PC]
-  E --> F[Intervals from root]
-  F --> G[For each chord template]
-  G --> H{Acceptable root?}
-  H -- no --> G
-  H -- yes --> I[Score candidate]
-  I --> G
-  G --> J[Collect candidates]
-  J --> K{Any candidates?}
-  K -- no --> Z
-  K -- yes --> L[Sort candidates]
-  L --> M[Pick best]
-  M --> N[Build name + slash]
-  N --> O[Return DetectedChord]
-```
+If `useFlats` is enabled, note names use flat spellings such as `Bb` instead of `A#`.
 
-## Scoring and Filtering
+## Supported Chord Families
 
-### Interval Extraction
+The current templates cover:
 
-`_intervalsFromRoot` computes the set of pitch-class offsets (1-11) from a proposed root.
+- triads: major, minor, diminished, augmented, suspended
+- sevenths: `7`, `maj7`, `m7`, `mMaj7`, `dim7`, `m7b5`
+- extensions: `9`, `11`, `13`, `maj9`, `m9`, `m11`, `m13`
+- added-tone chords: `add2`, `add4`, `add9`, `6`, `6/9`, `m6`
+- altered chords: `7b9`, `7#9`, `7#11`, `7b13`, `7#5`, `7b5`, `add#11`, `addb6`
 
-### Root Acceptability
+See [lib/common/constants.dart](/Users/erezlavi/Personal%20projects/piano_app/lib/common/constants.dart) for the exact template list.
 
-`_acceptableRoot` prevents impossible roots for triads:
-- If the chord template is a triad (contains 3rd + 5th, either minor or major), the played intervals must also include a triad.
-- If not, that root is rejected.
+## Current Test Coverage
 
-### Scoring
+The tests in [test/chord_detector_test.dart](/Users/erezlavi/Personal%20projects/piano_app/test/chord_detector_test.dart) currently verify:
 
-`_scoreChord` penalizes mismatches:
-- `extra = played - template`
-- `missing = template - played`
-- score = `-(extra + missing * 2)` (missing tones penalized more than extra tones)
-
-## Naming and Inversions
-
-`_buildName` forms `rootName + chordType` and decides whether to add a slash bass:
-
-- If bass is the root, no slash.
-- If bass is the 3rd or 5th, a slash is used.
-- Any other bass pitch class always produces a slash.
-
-Example: `Cmaj/E`, `Dm/F`, `G7/B`.
-
-### Chord Name Format for UI
-
-The returned chord name always starts with the root note (optionally with `#` or `b`), followed by the chord type and any slash bass. This makes it easy to render the root with a larger font size in the UI by splitting the string into:
-
-- Root: first 1 or 2 characters (`A`-`G` plus optional accidental).
-- Suffix: the remaining chord type and optional `/bass`.
-
-## Notes and Edge Cases
-
-- Fewer than three pitch classes returns `null` (no chord).
-- Duplicated octaves do not affect detection because pitch classes are de-duplicated.
-- The bass is determined by actual pitch, not pitch class order.
-- Score ties are resolved by chord rank, then bass match, then root pitch class.
-
-## References
-
-- Source: `lib/piano/chord_detector.dart`
-- Constants: `lib/common/constants.dart`
+- basic major, minor, and seventh chords
+- shell voicings without the fifth
+- added-color chords such as `Cadd9`, `Caddb6`, and `Cadd#11`
+- richer voicings such as `C6/9`
+- slash chords such as `C/E`

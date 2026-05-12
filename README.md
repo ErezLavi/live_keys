@@ -1,7 +1,14 @@
-# Live Keys
+# Live Keys 🎹
 
 Live Keys is a Flutter piano app with real time chord detection,
-MIDI input support and a playable keyboard (based on the awesome piano package and more).
+MIDI input support and a playable keyboard. Fully supported in MacOs, Windows and Android.
+
+## Downloads
+
+[![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/ErezLavi/live_keys/releases/latest)
+[![Windows](https://img.shields.io/badge/Windows-Download-0078D6?logo=windows)](https://github.com/ErezLavi/live_keys/releases/latest)
+[![Android](https://img.shields.io/badge/Android-Download-3DDC84?logo=android&logoColor=white)](https://github.com/ErezLavi/live_keys/releases/latest)
+
 
 ## Features
 
@@ -26,11 +33,16 @@ instrument.
 ## Getting Started
 
 1. Install Flutter (SDK 3.9+).
-2. Fetch dependencies:
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/ErezLavi/live_keys.git
+   cd piano_app
+   ```
+3. Fetch dependencies:
    ```bash
    flutter pub get
    ```
-3. Run the app:
+4. Run the app:
    ```bash
    flutter run
    ```

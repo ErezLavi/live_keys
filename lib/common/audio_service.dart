@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_midi_pro/flutter_midi_pro.dart';
 
 class AudioService {
@@ -32,8 +34,9 @@ class AudioService {
     int program = 0,
     int channel = 0,
   }) async {
-    _sfId = await _midi.loadSoundfontFile(
-      filePath: filePath,
+    final soundFontBytes = await File(filePath).readAsBytes();
+    _sfId = await _midi.loadSoundfontData(
+      data: soundFontBytes,
       bank: bank,
       program: program,
     );

@@ -8,14 +8,13 @@ class Constants {
     name: 'Rhodes',
     assetPath: 'assets/sf2/Rhodes.sf2',
   );
-  static const SoundFontOption yamahaSoundFont = SoundFontOption(
-    id: 'yamaha',
-    name: 'Yamaha Piano',
-    assetPath: 'assets/sf2/yamaha_piano.sf2',
-  );
+  // static const SoundFontOption yamahaSoundFont = SoundFontOption(
+  //   id: 'yamaha',
+  //   name: 'Yamaha Piano',
+  //   assetPath: 'assets/sf2/yamaha_piano.sf2',
+  // );
   static const List<SoundFontOption> soundFonts = [
-    rhodesSoundFont,
-    yamahaSoundFont,
+    rhodesSoundFont
   ];
 
   // colors

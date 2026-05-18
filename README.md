@@ -26,9 +26,8 @@ MIDI input support and a playable keyboard. Fully supported in MacOs, Windows an
 
 ## SoundFonts
 
-The app ships with SF2 files in `assets/sf2`. The default soundfont is set in
-`lib/common/constants.dart` (`rhodesSoundFontAsset`). Swap this to change the
-instrument.
+The app uses SoundFont files for instrument sounds. The default soundfont is set in
+`lib/common/constants.dart` (`rhodesSoundFontAsset`). But you can upload your own SoundFont files and use them in the app.
 
 ## Getting Started
 

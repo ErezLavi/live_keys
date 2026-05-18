@@ -189,13 +189,22 @@ class TopMenuBar extends StatelessWidget {
                     MenuItemButton(
                       closeOnActivate: false,
                       onPressed: () async {
-                        final result = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['sf2'],
-                        );
-                        final path = result?.files.single.path;
-                        if (path == null || path.isEmpty) return;
-                        await controller.importSoundFontFile(path);
+                        try {
+                          final result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['sf2'],
+                          );
+                          final path = result?.files.single.path;
+                          if (path == null || path.isEmpty) return;
+                          await controller.importSoundFontFile(path);
+                        } catch (error) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to import SF2: $error'),
+                            ),
+                          );
+                        }
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

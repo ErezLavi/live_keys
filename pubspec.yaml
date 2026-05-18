@@ -41,7 +41,7 @@ dependencies:
       ref: windows-support
   flutter_midi_command: ^0.5.4
   flutter_launcher_icons: ^0.14.2
-  file_picker: ^8.1.7
+  file_picker: ^10.3.10
 
 dev_dependencies:
   flutter_test:

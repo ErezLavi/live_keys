@@ -60,4 +60,4 @@ app.*.map.json
 **/*.so
 
 # Assets
-**/assets/*
+**/assets/sf2*

@@ -22,9 +22,9 @@ MIDI input support and a playable keyboard. Fully supported in MacOs, Windows an
 | --- |
 | ![Main layout](assets/showcase/main_layout.png) |
 
-| Chord Detection | Scales |
+| Chords | Scales |
 | --- | --- |
-| ![Chord detection](assets/showcase/chords.png) | ![Scales highlighting](assets/showcase/scales.png) |
+| ![Chords](assets/showcase/chords.png) | ![Scales](assets/showcase/scales.png) |
 
 | Menu |
 | --- |

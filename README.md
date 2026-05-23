@@ -12,11 +12,23 @@ MIDI input support and a playable keyboard. Fully supported in MacOs, Windows an
 
 ## Features
 
-- Chord detection with a large chord name display
+- Chord detection with a chord name display
 - Grand staff view of currently pressed notes
 - Chord and scales highlighting from the top-right menu
-- Hardware MIDI input (auto-connects to the first device found)
-- SoundFont playback via bundled SF2 assets
+- Hardware MIDI input support (auto-connects to the first available device) / Playing from the computer's keyboard
+- SoundFont playback via SF2 assets / uploaded custom SF2 files + mute mode
+
+| Main Layout |
+| --- |
+| ![Main layout](assets/showcase/main_layout.png) |
+
+| Chord Detection | Scales |
+| --- | --- |
+| ![Chord detection](assets/showcase/chords.png) | ![Scales highlighting](assets/showcase/scales.png) |
+
+| Menu |
+| --- |
+| ![Menu](assets/showcase/menu.png) |
 
 ## Controls
 
@@ -31,17 +43,19 @@ The app uses SoundFont files for instrument sounds. The default soundfont is set
 
 ## Getting Started
 
-1. Install Flutter (SDK 3.9+).
+1. Install a Flutter SDK compatible with Dart 3.9.
 2. Clone the repository:
    ```bash
    git clone https://github.com/ErezLavi/live_keys.git
-   cd piano_app
+   cd live_keys
    ```
-3. Fetch dependencies:
+3. Fetch dependencies (requires `git`, since one package is pulled from GitHub):
    ```bash
    flutter pub get
    ```
-4. Run the app:
+4. Run the app on one of the supported platforms:
    ```bash
-   flutter run
+   flutter run -d macos
+   flutter run -d windows
+   flutter run -d android
    ```

@@ -5,9 +5,9 @@ MIDI input support and a playable keyboard. Fully supported in MacOs, Windows an
 
 ## Downloads
 
-[![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/ErezLavi/live_keys/releases/latest)
-[![Windows](https://img.shields.io/badge/Windows-Download-0078D6?logo=windows)](https://github.com/ErezLavi/live_keys/releases/latest)
-[![Android](https://img.shields.io/badge/Android-Download-3DDC84?logo=android&logoColor=white)](https://github.com/ErezLavi/live_keys/releases/latest)
+[![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/ErezLavi/Live-Keys/releases/latest)
+[![Windows](https://img.shields.io/badge/Windows-Download-0078D6?logo=windows)](https://github.com/ErezLavi/Live-Keys/releases/latest)
+[![Android](https://img.shields.io/badge/Android-Download-3DDC84?logo=android&logoColor=white)](https://github.com/ErezLavi/Live-Keys/releases/latest)
 
 
 ## Features
@@ -46,8 +46,8 @@ The app uses SoundFont files for instrument sounds. The default soundfont is set
 1. Install a Flutter SDK compatible with Dart 3.9.
 2. Clone the repository:
    ```bash
-   git clone https://github.com/ErezLavi/live_keys.git
-   cd live_keys
+   git clone https://github.com/ErezLavi/Live-Keys.git
+   cd Live-Keys
    ```
 3. Fetch dependencies (requires `git`, since one package is pulled from GitHub):
    ```bash
